@@ -650,59 +650,6 @@
 
     // 初始化
     $(document).ready(async function () {
-        // 加载扩展设置界面
-        function loadExtensionSettings() {
-             // 按照 Extension 编写指南
-            const settingsHtmlUrl = `scripts/extensions/ST-GPT-SoVITS-Extension/settings.html`;
-            $.get(settingsHtmlUrl, function (data) {
-                $("#extensions_settings2").html(data);
-                
-                // 绑定重置按钮事件
-                $("#st-gpt-sovits-reset-ui").off('click').on('click', function() {
-                    const panel = document.getElementById('tts-floating-panel');
-                    if (panel) {
-                        panel.style.left = '50%';
-                        panel.style.top = '50%';
-                        panel.style.transform = 'translate(-50%, -50%)';
-                        panel.classList.remove('edge-hidden');
-                        showNotification('悬浮窗位置已重置');
-                    } else {
-                        createUI();
-                        showNotification('悬浮窗已重新创建');
-                    }
-                });
-            });
-        }
-
-        // 在扩展列表中添加点击事件
-        // SillyTavern 会自动创建列表项，点击时会加载 settings.html 到 #extensions_settings2
-        // 我们需要监听点击事件或者利用 ST 的机制
-        // 通常扩展只需要提供 settings.html，ST 会自动处理加载
-        // 但我们需要在加载后绑定 JS 事件。
-        // 可以监听 extension_settings_opened 事件或者轮询
-        
-        // 这里我们简单地挂载一个全局函数供 settings.html 中的 onclick 调用 (如果需要)
-        // 或者使用 MutationObserver 监听 #extensions_settings2 的内容变化
-        
-        const settingsObserver = new MutationObserver((mutations) => {
-            if (document.getElementById('st-gpt-sovits-reset-ui')) {
-                $("#st-gpt-sovits-reset-ui").off('click').on('click', function() {
-                     const panel = document.getElementById('tts-floating-panel');
-                     if (panel) {
-                         panel.style.left = 'auto';
-                         panel.style.top = '20%';
-                         panel.style.right = '20px';
-                         panel.style.transform = 'none';
-                         panel.classList.remove('edge-hidden', 'edge-mode');
-                         showNotification('悬浮窗位置已重置');
-                     } else {
-                         createUI();
-                     }
-                });
-            }
-        });
-        settingsObserver.observe(document.getElementById('extensions_settings2'), { childList: true, subtree: true });
-
         // 加载设置
         Settings.load();
 
@@ -713,13 +660,61 @@
             console.warn("TTS初始化连接失败", e);
         }
 
-        // 创建 UI
+        // 创建 UI (悬浮窗)
         createUI();
         
         // 开始监听聊天
         observeChat();
         
         console.log(`${EXTENSION_NAME} loaded.`);
+
+        // 注入扩展设置面板
+        const settingsHtmlUrl = `scripts/extensions/${EXTENSION_NAME}/settings.html`;
+        try {
+            const response = await fetch(settingsHtmlUrl);
+            if (response.ok) {
+                const html = await response.text();
+                
+                // 构建 inline-drawer 结构
+                const extensionHtml = `
+                    <div class="inline-drawer">
+                        <div class="inline-drawer-toggle inline-drawer-header">
+                            <b>GPT-SoVITS TTS Player</b>
+                            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                        </div>
+                        <div class="inline-drawer-content" style="display: none;">
+                            ${html}
+                        </div>
+                    </div>
+                `;
+                
+                // 挂载到 #extensions_settings
+                const container = $('#extensions_settings');
+                if (container.length) {
+                    container.append(extensionHtml);
+                    
+                    // 绑定设置面板内的事件
+                    $("#st-gpt-sovits-reset-ui").on('click', function() {
+                        const panel = document.getElementById('tts-floating-panel');
+                        if (panel) {
+                            panel.style.left = 'auto';
+                            panel.style.top = '20%';
+                            panel.style.right = '20px';
+                            panel.style.transform = 'none';
+                            panel.classList.remove('edge-hidden', 'edge-mode');
+                            showNotification('悬浮窗位置已重置');
+                        } else {
+                            createUI();
+                            showNotification('悬浮窗已重新创建');
+                        }
+                    });
+                } else {
+                    console.warn(`${EXTENSION_NAME}: #extensions_settings container not found.`);
+                }
+            }
+        } catch (e) {
+            console.error(`${EXTENSION_NAME}: Failed to load settings.html`, e);
+        }
     });
 
     // ==================================================================================
