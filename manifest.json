@@ -1,11 +1,10 @@
 {
+    "name": "ST-GPT-SoVITS-Extension",
     "display_name": "GPT-SoVITS TTS Player",
-    "name": "st-gpt-sovits-tts",
+    "description": "GPT-SoVITS TTS 播放器，支持角色管理、流式播放、多模式识别。",
+    "author": "AI & You",
     "version": "1.0.0",
-    "author": "AI & You (Ported by Cline)",
-    "description": "适配 GPT-SoVITS 整合包的 TTS 播放器，支持角色情感识别与自动播放。",
     "loading_order": 100,
-    "requires": [],
     "js": "index.js",
     "css": "style.css"
 }
