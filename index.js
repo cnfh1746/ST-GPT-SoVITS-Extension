@@ -570,11 +570,13 @@
         try {
             const adapter = API_ADAPTERS[currentApiMode] || API_ADAPTERS['gsvi'];
             
-            // GSVI 模式使用 POST /models
-            const response = await makeRequest(TTS_API_ENDPOINT_MODELS, {
-                method: "POST", 
-                headers: { "Content-Type": "application/json" },
-                data: JSON.stringify({ version: ttsApiVersion })
+            // GSVI 模式使用 GET /models/{version}
+            // 注意：API 定义是 @APP.get("/models/{version}")
+            const url = `${TTS_API_ENDPOINT_MODELS}/${ttsApiVersion}`;
+            
+            const response = await makeRequest(url, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
             });
             
             if (response.status === 200) {
