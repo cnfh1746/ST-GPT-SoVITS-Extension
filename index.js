@@ -1313,9 +1313,10 @@ function loadSettings() {
     emotion = settings.emotion;
     narrationVoice = settings.narrationVoice;
     dialogueVoice = settings.dialogueVoice;
-    characterVoices = settings.characterVoices;
+    characterVoices = settings.characterVoices || {};
     defaultVoice = settings.defaultVoice;
     allDetectedCharacters = new Set(settings.allDetectedCharacters || []);
+    characterGroups = settings.characterGroups || {};
     maxConcurrentGenerations = settings.maxConcurrentGenerations;
     preloadEnabled = settings.preloadEnabled;
     autoPlayEnabled = settings.autoPlayEnabled;
@@ -1338,6 +1339,7 @@ function saveSettings() {
         characterVoices,
         defaultVoice,
         allDetectedCharacters: Array.from(allDetectedCharacters),
+        characterGroups,
         maxConcurrentGenerations,
         preloadEnabled,
         autoPlayEnabled,
@@ -2233,7 +2235,6 @@ function createSettingsModal() {
                     <div class="tts-setting-section">
                         <h3>👥 检测到的角色</h3>
                         <div id="character-voices-container"></div>
-                        <div id="tts-character-list">${characterListHtml}</div>
                     </div>
                 </div>
             </div>
