@@ -2221,7 +2221,18 @@ function createSettingsModal() {
                     </div>
                     
                     <div class="tts-setting-section">
+                        <h3>📂 角色分组管理</h3>
+                        <div class="tts-group-controls" style="display:flex;gap:10px;margin-bottom:16px;">
+                            <input type="text" id="new-group-name" placeholder="输入分组名称" style="flex:1;">
+                            <input type="color" id="new-group-color" value="#667eea" style="width:40px;height:36px;border-radius:8px;border:1px solid #ced4da;">
+                            <button id="tts-create-group" class="menu_button">创建分组</button>
+                        </div>
+                        <div id="character-groups-container"></div>
+                    </div>
+                    
+                    <div class="tts-setting-section">
                         <h3>👥 检测到的角色</h3>
+                        <div id="character-voices-container"></div>
                         <div id="tts-character-list">${characterListHtml}</div>
                     </div>
                 </div>
@@ -2248,6 +2259,11 @@ function createSettingsModal() {
             select.append(`<option value="${model}" ${model === currentVoice ? 'selected' : ''}>${model}</option>`);
         });
     });
+
+    // 渲染分组和角色语音
+    renderCharacterGroups();
+    renderCharacterVoices();
+
 
     // 事件绑定
     modal.find('.tts-close-btn').on('click', () => modal.remove());
@@ -2288,6 +2304,21 @@ function createSettingsModal() {
     // 功能开关
     $('#tts-auto-play').on('change', function () { autoPlayEnabled = $(this).is(':checked'); saveSettings(); });
     $('#tts-frontend-adaptation').on('change', function () { frontendAdaptationEnabled = $(this).is(':checked'); saveSettings(); });
+
+    // 创建分组
+    $('#tts-create-group').on('click', function () {
+        const groupName = $('#new-group-name').val().trim();
+        const groupColor = $('#new-group-color').val();
+        if (!groupName) { showNotification('请输入分组名称', 'warning'); return; }
+        if (characterGroups[groupName]) { showNotification('分组已存在', 'warning'); return; }
+        characterGroups[groupName] = { color: groupColor, characters: [] };
+        saveSettings();
+        renderCharacterGroups();
+        renderCharacterVoices();
+        $('#new-group-name').val('');
+        showNotification(`分组 "${groupName}" 已创建`, 'success');
+    });
+
 
     // 角色设置
     modal.on('change', '.tts-character-voice', function () {
