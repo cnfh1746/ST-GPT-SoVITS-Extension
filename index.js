@@ -2211,22 +2211,44 @@ function createSettingsModal() {
                 </div>
                 <div class="tts-modal-body">
                     <div class="tts-setting-section">
+                        <div class="tts-setting-section">
                         <h3>🔧 API设置</h3>
                         <div class="tts-setting-item"><label>TTS API 地址</label><input type="text" id="tts-api-url" value="${ttsApiBaseUrl}"></div>
-                        <div class="tts-setting-item"><label>API 版本</label>
+                        <div class="tts-setting-item" style="display:flex;gap:10px;">
+                            <label class="tts-api-label" style="min-width:60px;">API 版本</label>
                             <select id="tts-api-version">
                                 <option value="v2" ${ttsApiVersion === 'v2' ? 'selected' : ''}>v2</option>
                                 <option value="v3" ${ttsApiVersion === 'v3' ? 'selected' : ''}>v3</option>
                                 <option value="v4" ${ttsApiVersion === 'v4' ? 'selected' : ''}>v4</option>
                             </select>
                         </div>
-                        <div class="tts-setting-item" style="display:flex;gap:10px;">
-                            <button id="tts-test-connection" class="menu_button">测试连接</button>
-                            <button id="tts-refresh-models" class="menu_button">刷新模型</button>
+                        <div class="tts-api-actions">
+                            <button id="tts-test-connection" class="tts-control-btn primary"><i class="icon">🔌</i> 测试连接</button>
+                            <button id="tts-refresh-models" class="tts-control-btn secondary"><i class="icon">🔄</i> 刷新模型</button>
                         </div>
                     </div>
                     
                     <div class="tts-setting-section">
+                        <h3>⚡ 功能开关</h3>
+                        <div class="tts-switch-grid">
+                            <div class="tts-switch-card">
+                                <span>自动播放</span>
+                                <label class="tts-switch-label">
+                                    <input type="checkbox" id="tts-auto-play" ${autoPlayEnabled ? 'checked' : ''}>
+                                    <span class="tts-switch-slider"></span>
+                                </label>
+                            </div>
+                            <div class="tts-switch-card">
+                                <span>前端美化适配</span>
+                                <label class="tts-switch-label">
+                                    <input type="checkbox" id="tts-frontend-adaptation" ${frontendAdaptationEnabled ? 'checked' : ''}>
+                                    <span class="tts-switch-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                     <div class="tts-setting-section">
                         <h3>🎯 识别模式</h3>
                         <div class="tts-radio-group">
                             <label class="tts-radio-item"><input type="radio" name="detection-mode" value="character_and_dialogue" ${detectionMode === 'character_and_dialogue' ? 'checked' : ''}><span>【角色】「对话」</span></label>
@@ -2254,33 +2276,13 @@ function createSettingsModal() {
                         <div class="tts-setting-item"><label>默认情感</label><select id="tts-emotion-select"><option value="默认">默认</option></select></div>
                         <div class="tts-setting-item" id="global-speed-setting"><label>语速 <span id="speed-value">${speedFacter.toFixed(1)}</span></label><input type="range" id="tts-speed" min="0.5" max="2.0" step="0.1" value="${speedFacter}"></div>
                     </div>
-                    
-                    <div class="tts-setting-section">
-                        <h3>⚡ 功能开关</h3>
-                        <div class="tts-setting-item">
-                            <label class="tts-switch-label">
-                                <span>自动播放</span>
-                                <input type="checkbox" id="tts-auto-play" ${autoPlayEnabled ? 'checked' : ''}>
-                                <span class="tts-switch-slider"></span>
-                            </label>
-                            <p class="tts-setting-desc">收到新消息后自动开始TTS播放</p>
-                        </div>
-                        <div class="tts-setting-item">
-                            <label class="tts-switch-label">
-                                <span>前端美化适配</span>
-                                <input type="checkbox" id="tts-frontend-adaptation" ${frontendAdaptationEnabled ? 'checked' : ''}>
-                                <span class="tts-switch-slider"></span>
-                            </label>
-                            <p class="tts-setting-desc">启用后可从juus本体等美化前端中解析文本（暂未完全支持）</p>
-                        </div>
-                    </div>
-                    
+
                     <div class="tts-setting-section" id="character-groups-section">
                         <h3>📂 角色分组管理</h3>
-                        <div class="tts-group-controls" style="display:flex;gap:10px;margin-bottom:16px;">
-                            <input type="text" id="new-group-name" placeholder="输入分组名称" style="flex:1;">
-                            <input type="color" id="new-group-color" value="#667eea" style="width:40px;height:36px;border-radius:8px;border:1px solid #ced4da;">
-                            <button id="tts-create-group" class="menu_button">创建分组</button>
+                        <div class="tts-group-controls">
+                            <input type="text" id="new-group-name" class="tts-cool-input" placeholder="输入分组名称">
+                            <input type="color" id="new-group-color" class="tts-color-picker" value="#667eea">
+                            <button id="tts-create-group" class="tts-control-btn primary">创建分组</button>
                         </div>
                         <div id="character-groups-container"></div>
                     </div>
