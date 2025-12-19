@@ -1619,10 +1619,159 @@ function updateEmotionSelect(voiceName) {
     emotionSelect.value = emotion;
 }
 
+// 填充感情选择器
+function populateEmotionSelect(emotions) {
+    const select = document.getElementById('tts-emotion-select');
+    if (!select) return;
+    const currentEmotion = emotion;
+    select.innerHTML = '';
+    emotions.forEach(emo => {
+        const option = document.createElement('option');
+        option.value = emo;
+        option.textContent = emo;
+        select.appendChild(option);
+    });
+    if (emotions.includes(currentEmotion)) {
+        select.value = currentEmotion;
+    } else {
+        select.value = emotions[0] || '默认';
+    }
+    if (emotion !== select.value) {
+        emotion = select.value;
+        saveSettings();
+    }
+}
+
+// 渲染角色语音设置
+async function renderCharacterVoices() {
+    const container = document.getElementById('character-voices-container');
+    if (!container) return;
+
+    if (allDetectedCharacters.size === 0) {
+        container.innerHTML = '<p class="tts-empty-state">暂无检测到的角色</p>';
+        return;
+    }
+
+    // 获取已分组的角色
+    const assignedCharacters = new Set();
+    Object.values(characterGroups).forEach(group => {
+        if (group.characters) group.characters.forEach(char => assignedCharacters.add(char));
+    });
+
+    // 只显示未分组的角色
+    const unassignedCharacters = Array.from(allDetectedCharacters).filter(char => !assignedCharacters.has(char));
+
+    if (unassignedCharacters.length === 0) {
+        container.innerHTML = '<p class="tts-empty-state">所有角色都已分组，请在上方分组中配置语音</p>';
+        return;
+    }
+
+    container.innerHTML = '';
+    for (const char of unassignedCharacters) {
+        const charDiv = document.createElement('div');
+        charDiv.className = 'tts-character-item';
+
+        const voiceSetting = characterVoices[char];
+        const voice = typeof voiceSetting === 'object' ? voiceSetting.voice || '' : voiceSetting || '';
+        const version = typeof voiceSetting === 'object' ? voiceSetting.version || ttsApiVersion : ttsApiVersion;
+        const speed = typeof voiceSetting === 'object' ? voiceSetting.speed || 1.0 : 1.0;
+        const modelsForVersion = await getModelsForVersion(version);
+
+        charDiv.innerHTML = `
+            <div class="tts-character-header">
+                <span class="character-name">${char}</span>
+                <button class="tts-delete-char" data-char="${char}">×</button>
+            </div>
+            <div class="tts-character-controls">
+                <select class="tts-character-version" data-char="${char}">
+                    ${['v2', 'v2Pro', 'v2ProPlus', 'v3', 'v4'].map(v => `<option value="${v}" ${version === v ? 'selected' : ''}>${v}</option>`).join('')}
+                </select>
+                <select class="tts-character-voice" data-char="${char}">
+                    <option value="">» 使用默认 «</option>
+                    <option value="${DO_NOT_PLAY_VALUE}" ${voice === DO_NOT_PLAY_VALUE ? 'selected' : ''}>🔇 不播放</option>
+                    ${modelsForVersion.map(model => `<option value="${model}" ${voice === model ? 'selected' : ''}>${model}</option>`).join('')}
+                </select>
+                <div class="tts-character-speed-control">
+                    <label>语速: <span class="tts-character-speed-value" data-char="${char}">${speed}</span></label>
+                    <input type="range" class="tts-character-speed-slider" data-char="${char}" min="0.5" max="2.0" step="0.01" value="${speed}">
+                </div>
+            </div>
+        `;
+        container.appendChild(charDiv);
+    }
+
+    updateSingleCharacterSelector();
+    bindCharacterVoiceEvents(container);
+}
+
+// 绑定角色语音事件
+function bindCharacterVoiceEvents(container) {
+    // 版本切换
+    container.querySelectorAll('.tts-character-version').forEach(select => {
+        select.addEventListener('change', async (e) => {
+            const char = e.target.dataset.char;
+            const newVersion = e.target.value;
+            const voiceSelect = e.target.closest('.tts-character-controls').querySelector('.tts-character-voice');
+            const currentVoice = voiceSelect.value;
+            const models = await getModelsForVersion(newVersion);
+            voiceSelect.innerHTML = `<option value="">» 使用默认 «</option><option value="${DO_NOT_PLAY_VALUE}">🔇 不播放</option>${models.map(model => `<option value="${model}">${model}</option>`).join('')}`;
+            if (models.includes(currentVoice)) voiceSelect.value = currentVoice;
+            else voiceSelect.value = '';
+            voiceSelect.dispatchEvent(new Event('change'));
+        });
+    });
+
+    // 语音选择
+    container.querySelectorAll('.tts-character-voice').forEach(select => {
+        select.addEventListener('change', (e) => {
+            const char = e.target.dataset.char;
+            const voice = e.target.value;
+            const version = e.target.closest('.tts-character-controls').querySelector('.tts-character-version').value;
+            if (voice) characterVoices[char] = { voice, version, speed: characterVoices[char]?.speed || 1.0 };
+            else delete characterVoices[char];
+            saveSettings();
+            updateEmotionSelect(voice || defaultVoice);
+        });
+    });
+
+    // 语速滑块
+    container.querySelectorAll('.tts-character-speed-slider').forEach(slider => {
+        const char = slider.dataset.char;
+        const speedValue = container.querySelector(`.tts-character-speed-value[data-char="${char}"]`);
+        slider.addEventListener('input', (e) => { speedValue.textContent = e.target.value; });
+        slider.addEventListener('change', (e) => {
+            const speed = parseFloat(e.target.value);
+            if (characterVoices[char]) characterVoices[char].speed = speed;
+            else characterVoices[char] = { voice: '', version: ttsApiVersion, speed };
+            saveSettings();
+        });
+    });
+
+    // 删除角色
+    container.querySelectorAll('.tts-delete-char').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const char = e.target.dataset.char;
+            allDetectedCharacters.delete(char);
+            delete characterVoices[char];
+            Object.keys(characterGroups).forEach(groupName => {
+                const group = characterGroups[groupName];
+                if (group.characters) {
+                    group.characters = group.characters.filter(c => c !== char);
+                    if (group.characters.length === 0) delete characterGroups[groupName];
+                }
+            });
+            saveSettings();
+            renderCharacterVoices();
+            renderCharacterGroups();
+        });
+    });
+}
+
 function updatePlayButton(icon, text) {
     const btn = document.getElementById('tts-play-btn');
     if (btn) btn.innerHTML = `<i class="icon">${icon}</i><span class="text">${text}</span>`;
 }
+
 
 // 播放控制
 function handlePlayPauseResumeClick() {
