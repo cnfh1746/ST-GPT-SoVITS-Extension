@@ -276,134 +276,197 @@
     flex: 1;
 }
 
-/* 设置分组和表单项 */
+/* 深度美化 - 玻璃拟态卡片 */
 .tts-setting-section {
-    background: rgba(0, 0, 0, 0.02);
-    border-radius: var(--tts-radius-md);
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--tts-radius-lg);
     padding: 20px;
-    margin-bottom: 24px;
-    border: 1px solid rgba(0, 0, 0, 0.03);
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    transition: var(--tts-transition);
+}
+
+.tts-setting-section:hover {
+    background: rgba(255, 255, 255, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+    border-color: rgba(255, 255, 255, 0.8);
 }
 
 .tts-setting-section h3 {
     margin: 0 0 16px 0;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--tts-text-main);
+    font-size: 16px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--tts-primary), #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed rgba(99, 102, 241, 0.2);
 }
 
-.tts-setting-item {
-    margin-bottom: 16px;
+/* 深度美化 - 自定义 Radio Group */
+.tts-radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
-.tts-setting-item label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 14px;
-    font-weight: 500;
+.tts-radio-item {
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+}
+
+.tts-radio-item input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.tts-radio-item span {
+    display: inline-block;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: var(--tts-radius-full);
+    font-size: 13px;
     color: var(--tts-text-sub);
+    transition: var(--tts-transition);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
+.tts-radio-item:hover span {
+    background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+    color: var(--tts-primary);
+}
+
+.tts-radio-item input[type="radio"]:checked+span {
+    background: linear-gradient(135deg, var(--tts-primary), #4338ca);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    font-weight: 600;
+}
+
+/* 深度美化 - 自定义 iOS 风格 Toggle */
+.tts-toggle-group {
+    display: flex;
+    background: rgba(0, 0, 0, 0.05);
+    /* 槽背景 */
+    padding: 4px;
+    border-radius: var(--tts-radius-full);
+    width: fit-content;
+}
+
+.tts-toggle-item {
+    position: relative;
+    cursor: pointer;
+}
+
+.tts-toggle-item input[type="radio"] {
+    display: none;
+}
+
+.tts-toggle-item span {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: var(--tts-radius-full);
+    font-size: 13px;
+    color: var(--tts-text-sub);
+    transition: var(--tts-transition);
+}
+
+.tts-toggle-item.active span {
+    background: white;
+    color: var(--tts-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+}
+
+/* 深度美化 - 输入框与下拉框 */
 .tts-setting-item input[type="text"],
 .tts-setting-item select {
+    appearance: none;
+    -webkit-appearance: none;
     width: 100%;
-    padding: 10px 14px;
-    border: 1px solid #e5e7eb;
-    border-radius: var(--tts-radius-sm);
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: var(--tts-radius-md);
     font-size: 14px;
+    color: var(--tts-text-main);
     transition: var(--tts-transition);
-    background: #fff;
-    color: #333;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
-@media (prefers-color-scheme: dark) {
-
-    .tts-setting-item input[type="text"],
-    .tts-setting-item select {
-        background: #2d2d35;
-        border-color: #444;
-        color: #eee;
-    }
+.tts-setting-item select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
 }
 
 .tts-setting-item input[type="text"]:focus,
 .tts-setting-item select:focus {
-    outline: none;
+    background: white;
     border-color: var(--tts-primary);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    outline: none;
 }
 
-/* 开关 Toggle 样式 */
-.tts-switch-label {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    padding: 4px 0;
-}
-
-.tts-switch-slider {
-    position: relative;
-    width: 44px;
-    height: 24px;
-    background: #e5e7eb;
-    border-radius: 20px;
-    transition: var(--tts-transition);
-}
-
-.tts-switch-slider::before {
-    content: '';
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    background: white;
-    border-radius: 50%;
-    top: 3px;
-    left: 3px;
-    transition: var(--tts-transition);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-input:checked+.tts-switch-slider {
-    background: var(--tts-primary);
-}
-
-input:checked+.tts-switch-slider::before {
-    transform: translateX(20px);
-}
-
-/* 滑块 Range 样式 */
+/* 深度美化 - Range Slider */
 input[type=range] {
     -webkit-appearance: none;
     width: 100%;
+    margin: 10px 0;
     background: transparent;
 }
 
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 6px;
+    cursor: pointer;
+    background: linear-gradient(90deg, #e0e7ff, #e0e7ff);
+    /* Active portion handled by JS usually, simplified here */
+    background: rgba(0, 0, 0, 0.05);
+    /* Track background */
+    border-radius: 999px;
+    border: none;
+}
+
+/* Progress fill trick for pure CSS */
+input[type=range]::-webkit-slider-runnable-track {
+    background: linear-gradient(90deg, var(--tts-primary) var(--range-progress, 50%), rgba(0, 0, 0, 0.05) var(--range-progress, 50%));
+}
+
 input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
     height: 20px;
     width: 20px;
     border-radius: 50%;
     background: white;
     border: 2px solid var(--tts-primary);
     cursor: pointer;
-    margin-top: -8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    transition: var(--tts-transition);
+    -webkit-appearance: none;
+    margin-top: -7px;
+    /* center thumb */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 input[type=range]::-webkit-slider-thumb:hover {
-    transform: scale(1.1);
-}
-
-input[type=range]::-webkit-slider-runnable-track {
-    width: 100%;
-    height: 4px;
-    background: #e5e7eb;
-    border-radius: 2px;
+    transform: scale(1.2);
+    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
 }
 
 /* 边缘指示器 */
@@ -614,4 +677,174 @@ input[type=range]::-webkit-slider-runnable-track {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
+}
+
+/* 深度美化 - 角色列表项 */
+.tts-character-item {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: var(--tts-radius-md);
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    transition: var(--tts-transition);
+}
+
+.tts-character-item:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+    border-color: var(--tts-primary);
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.tts-character-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.character-name {
+    font-weight: 700;
+    color: var(--tts-text-main);
+    font-size: 15px;
+}
+
+.tts-delete-char {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--tts-danger);
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--tts-transition);
+}
+
+.tts-delete-char:hover {
+    background: var(--tts-danger);
+    color: white;
+    transform: rotate(90deg);
+}
+
+/* 角色控件紧凑化 */
+.tts-character-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tts-character-speed-control {
+    background: rgba(0, 0, 0, 0.03);
+    padding: 10px 12px;
+    border-radius: var(--tts-radius-sm);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tts-character-speed-control label {
+    font-size: 12px;
+    margin: 0;
+    white-space: nowrap;
+    min-width: 60px;
+}
+
+.tts-character-speed-slider {
+    margin: 0 !important;
+    height: 4px;
+}
+
+/* 修复 Lint 警告: background-clip */
+.tts-modal-header h2 {
+    background-clip: text;
+    -webkit-background-clip: text;
+}
+
+.tts-setting-section h3 {
+    background-clip: text;
+    -webkit-background-clip: text;
+}
+
+/* 深度美化 - 黑暗模式适配完善 */
+@media (prefers-color-scheme: dark) {
+    .tts-setting-section {
+        background: rgba(30, 30, 35, 0.6);
+        border-color: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .tts-setting-section:hover {
+        background: rgba(40, 40, 45, 0.8);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .tts-setting-item input[type="text"],
+    .tts-setting-item select {
+        background: rgba(0, 0, 0, 0.2);
+        border-color: rgba(255, 255, 255, 0.1);
+        color: #f3f4f6;
+    }
+
+    .tts-setting-item input[type="text"]:focus,
+    .tts-setting-item select:focus {
+        background: rgba(0, 0, 0, 0.4);
+        border-color: var(--tts-primary);
+    }
+
+    .tts-switch-slider {
+        background: #374151;
+    }
+
+    .tts-radio-item span {
+        background: rgba(255, 255, 255, 0.05);
+        color: #d1d5db;
+        border-color: transparent;
+    }
+
+    .tts-radio-item:hover span {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+
+    .tts-toggle-group {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .tts-toggle-item span {
+        color: #9ca3af;
+    }
+
+    .tts-toggle-item.active span {
+        background: #374151;
+        color: white;
+    }
+
+    .tts-character-item {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .tts-character-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--tts-primary);
+    }
+
+    .tts-character-header {
+        border-bottom-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .character-name {
+        color: #f3f4f6;
+    }
+
+    .tts-character-speed-control {
+        background: rgba(0, 0, 0, 0.2);
+    }
 }
