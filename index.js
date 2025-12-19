@@ -2151,7 +2151,9 @@ function createFloatingPanel() {
                 <button id="tts-stop-btn" class="tts-control-btn danger" style="display:none;"><i class="icon">⏹</i><span class="text">停止</span></button>
                 <button id="tts-replay-btn" class="tts-control-btn secondary" disabled><i class="icon">🔁</i><span class="text">重播</span></button>
                 <button id="tts-reinfer-btn" class="tts-control-btn secondary" disabled><i class="icon">🔄</i><span class="text">重推</span></button>
+                <button id="tts-detect-btn" class="tts-control-btn secondary"><i class="icon">🔍</i><span class="text">检测</span></button>
                 <button id="tts-settings-btn" class="tts-control-btn settings"><i class="icon">⚙</i><span class="text">设置</span></button>
+                <button id="tts-hide-btn" class="tts-control-btn secondary"><i class="icon">👁</i><span class="text">隐藏</span></button>
             </div>
         </div>
     `);
@@ -2162,8 +2164,10 @@ function createFloatingPanel() {
     $('#tts-play-btn').on('click', handlePlayPauseResumeClick);
     $('#tts-stop-btn').on('click', handleStopClick);
     $('#tts-replay-btn').on('click', handleReplayClick);
-    $('#tts-reinfer-btn').on('click', handlePlayPauseResumeClick);
+    $('#tts-reinfer-btn').on('click', handleReinferClick);
+    $('#tts-detect-btn').on('click', handleFrontendDetectClick);
     $('#tts-settings-btn').on('click', createSettingsModal);
+    $('#tts-hide-btn').on('click', toggleEdgeHide);
 }
 
 // 创建设置弹窗 (完整版)

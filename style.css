@@ -848,3 +848,221 @@ input[type=range]::-webkit-slider-thumb:hover {
         background: rgba(0, 0, 0, 0.2);
     }
 }
+
+/* ========== 分组管理样式 ========== */
+.tts-group-item {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.tts-group-item:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.tts-group-header {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #e9ecef;
+    cursor: pointer;
+}
+
+.tts-group-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tts-group-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tts-collapse-icon {
+    font-size: 12px;
+    color: #6c757d;
+    transition: transform 0.2s ease;
+}
+
+.tts-group-count {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.tts-delete-group {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.tts-delete-group:hover {
+    background: #ff5252;
+    transform: scale(1.05);
+}
+
+.tts-group-content {
+    padding: 15px 20px;
+}
+
+.tts-group-characters {
+    margin-bottom: 15px;
+}
+
+.tts-group-character {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 15px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: all 0.2s ease;
+}
+
+.tts-group-character:hover {
+    background: #e9ecef;
+    border-color: #ced4da;
+}
+
+.tts-character-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    flex: 1;
+}
+
+.tts-character-controls-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.tts-character-version-in-group,
+.tts-character-voice-in-group {
+    padding: 6px 10px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 13px;
+    background: white;
+}
+
+.tts-character-voice-in-group {
+    min-width: 150px;
+}
+
+.tts-remove-from-group {
+    background: #ffc107;
+    color: #212529;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.tts-remove-from-group:hover {
+    background: #ffb300;
+    transform: scale(1.05);
+}
+
+.tts-add-character {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 12px;
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.tts-add-character:hover {
+    border-color: #667eea;
+    background: #f8f9ff;
+}
+
+.tts-character-select {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 13px;
+    background: white;
+}
+
+.tts-add-to-group {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.tts-add-to-group:hover {
+    background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+    transform: translateY(-1px);
+}
+
+/* 分组黑暗模式 */
+@media (prefers-color-scheme: dark) {
+    .tts-group-item {
+        background: #2d2d35;
+        border-color: #444;
+    }
+
+    .tts-group-header {
+        background: #35353d;
+        border-bottom-color: #444;
+    }
+
+    .tts-group-name {
+        color: #e9ecef;
+    }
+
+    .tts-group-character {
+        background: #35353d;
+        border-color: #444;
+    }
+
+    .tts-group-character:hover {
+        background: #3d3d45;
+    }
+
+    .tts-add-character {
+        background: #35353d;
+        border-color: #555;
+    }
+
+    .tts-character-version-in-group,
+    .tts-character-voice-in-group,
+    .tts-character-select {
+        background: #2d2d35;
+        border-color: #555;
+        color: #e9ecef;
+    }
+}
