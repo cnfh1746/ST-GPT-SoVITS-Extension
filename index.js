@@ -33,7 +33,8 @@ const defaultSettings = {
     edgeMode: false,
     frontendAdaptationEnabled: false,
     isSingleCharacterMode: false,
-    singleCharacterTarget: ''
+    singleCharacterTarget: '',
+    theme: 'dark' // Added theme setting
 };
 
 // 运行时变量
@@ -74,6 +75,7 @@ let batchMode = true;
 let edgeMode = false;
 let characterGroups = {};
 let extensionEnabled = true;
+let currentTheme = 'dark'; // Added global theme variable
 
 // 控制台日志存储
 let consoleLogs = [];
@@ -1319,6 +1321,12 @@ function loadSettings() {
     allDetectedCharacters = new Set(settings.allDetectedCharacters || []);
     characterGroups = settings.characterGroups || {};
     extensionEnabled = settings.extensionEnabled !== undefined ? settings.extensionEnabled : true;
+    currentTheme = settings.theme || 'dark';
+    if (currentTheme === 'light') {
+        document.body.setAttribute('data-theme', 'light');
+    } else {
+        document.body.removeAttribute('data-theme');
+    }
     maxConcurrentGenerations = settings.maxConcurrentGenerations;
     preloadEnabled = settings.preloadEnabled;
     autoPlayEnabled = settings.autoPlayEnabled;
@@ -1343,6 +1351,7 @@ function saveSettings() {
         allDetectedCharacters: Array.from(allDetectedCharacters),
         characterGroups,
         extensionEnabled,
+        theme: currentTheme,
         maxConcurrentGenerations,
         preloadEnabled,
         autoPlayEnabled,
@@ -2170,6 +2179,22 @@ function createFloatingPanel() {
     $('#tts-hide-btn').on('click', toggleEdgeHide);
 }
 
+// 切换主题
+function switchTheme() {
+    currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+    const btn = $('#tts-theme-toggle');
+
+    if (currentTheme === 'light') {
+        document.body.setAttribute('data-theme', 'light');
+        btn.text('☀️');
+    } else {
+        document.body.removeAttribute('data-theme');
+        btn.text('🌙');
+    }
+
+    saveSettings();
+}
+
 // 创建设置弹窗 (完整版)
 function createSettingsModal() {
     if ($('#tts-settings-modal').length) { $('#tts-settings-modal').remove(); return; }
@@ -2211,17 +2236,18 @@ function createSettingsModal() {
                 </div>
                 <div class="tts-modal-body">
                     <div class="tts-setting-section">
-                        <div class="tts-setting-section">
-                        <h3>🔧 API设置</h3>
-                        <div class="tts-setting-item"><label>TTS API 地址</label><input type="text" id="tts-api-url" value="${ttsApiBaseUrl}"></div>
-                        <div class="tts-setting-item" style="display:flex;gap:10px;">
-                            <label class="tts-api-label" style="min-width:60px;">API 版本</label>
-                            <select id="tts-api-version">
-                                <option value="v2" ${ttsApiVersion === 'v2' ? 'selected' : ''}>v2</option>
-                                <option value="v3" ${ttsApiVersion === 'v3' ? 'selected' : ''}>v3</option>
-                                <option value="v4" ${ttsApiVersion === 'v4' ? 'selected' : ''}>v4</option>
-                            </select>
-                        </div>
+                <div class="tts-setting-section">
+                    <h3>🔧 API设置<button id="tts-theme-toggle" class="tts-control-btn icon-only" style="margin-left:auto;" title="切换日/夜模式">${currentTheme === 'light' ? '☀️' : '🌙'}</button></h3>
+                    <div class="tts-setting-item"><label>TTS API 地址</label><input type="text" id="tts-api-url" value="${ttsApiBaseUrl}"></div>
+                    <div class="tts-setting-item" style="display:flex;gap:10px;">
+                        <label class="tts-api-label" style="min-width:60px;">API 版本</label>
+                        <select id="tts-api-version">
+                            <option value="v2" ${ttsApiVersion === 'v2' ? 'selected' : ''}>v2</option>
+                            <option value="v3" ${ttsApiVersion === 'v3' ? 'selected' : ''}>v3</option>
+                            <option value="v4" ${ttsApiVersion === 'v4' ? 'selected' : ''}>v4</option>
+                        </select>
+                    </div>
+
                         <div class="tts-api-actions">
                             <button id="tts-test-connection" class="tts-control-btn primary"><i class="icon">🔌</i> 测试连接</button>
                             <button id="tts-refresh-models" class="tts-control-btn secondary"><i class="icon">🔄</i> 刷新模型</button>
@@ -2328,6 +2354,7 @@ function createSettingsModal() {
     modal.on('click', (e) => { if (e.target === modal[0]) modal.remove(); });
 
     // API设置
+    $('#tts-theme-toggle').on('click', switchTheme);
     $('#tts-api-url').on('change', function () { ttsApiBaseUrl = $(this).val().replace(/\/$/, ''); updateApiEndpoints(); saveSettings(); });
     $('#tts-api-version').on('change', function () { ttsApiVersion = $(this).val(); saveSettings(); fetchTTSModels(); });
     $('#tts-test-connection').on('click', async function () {
