@@ -1,8 +1,14 @@
 <div class="st-gpt-sovits-settings">
-    <p>TTS悬浮窗已在页面右侧显示。点击悬浮窗的⚙按钮打开完整设置。</p>
-    <div>
+    <div class="inline-drawer-header" style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <label class="checkbox_label" style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+            <input type="checkbox" id="st-gpt-sovits-enabled" checked>
+            <span>启用TTS扩展</span>
+        </label>
+    </div>
+    <p style="margin:8px 0;color:#888;font-size:13px;">TTS悬浮窗已在页面右侧显示。点击悬浮窗的⚙按钮打开完整设置。</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button id="st-gpt-sovits-reset-ui" class="menu_button">
-            <i class="fa-solid fa-arrows-rotate"></i> 重置悬浮窗位置
+            <i class="fa-solid fa-arrows-rotate"></i> 重置位置
         </button>
         <button id="st-gpt-sovits-show-panel" class="menu_button">
             <i class="fa-solid fa-eye"></i> 显示悬浮窗

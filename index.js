@@ -73,6 +73,7 @@ let edgeIndicatorLastTop = null;
 let batchMode = true;
 let edgeMode = false;
 let characterGroups = {};
+let extensionEnabled = true;
 
 // 控制台日志存储
 let consoleLogs = [];
@@ -1317,6 +1318,7 @@ function loadSettings() {
     defaultVoice = settings.defaultVoice;
     allDetectedCharacters = new Set(settings.allDetectedCharacters || []);
     characterGroups = settings.characterGroups || {};
+    extensionEnabled = settings.extensionEnabled !== undefined ? settings.extensionEnabled : true;
     maxConcurrentGenerations = settings.maxConcurrentGenerations;
     preloadEnabled = settings.preloadEnabled;
     autoPlayEnabled = settings.autoPlayEnabled;
@@ -1340,6 +1342,7 @@ function saveSettings() {
         defaultVoice,
         allDetectedCharacters: Array.from(allDetectedCharacters),
         characterGroups,
+        extensionEnabled,
         maxConcurrentGenerations,
         preloadEnabled,
         autoPlayEnabled,
@@ -2414,14 +2417,15 @@ jQuery(async () => {
     link.href = `${extensionFolderPath}style.css`;
     document.head.appendChild(link);
 
-    // 创建设置面板入口
-    const settingsHtml = `
-        <div class="tts-extension-settings">
-            <p>TTS播放器已加载。悬浮控制面板显示在页面右侧。</p>
-            <button id="tts-reset-panel" class="menu_button">重置悬浮窗位置</button>
-            <button id="tts-refresh-models-btn" class="menu_button">刷新模型列表</button>
-        </div>
-    `;
+    // 加载设置面板HTML
+    let settingsHtml = '';
+    try {
+        const response = await fetch(`${extensionFolderPath}settings.html`);
+        settingsHtml = await response.text();
+    } catch (e) {
+        console.error('[GPT-SoVITS TTS] 加载设置面板失败:', e);
+        settingsHtml = '<p>加载设置失败</p>';
+    }
 
     const extensionPanel = $(`
         <div class="inline-drawer">
@@ -2437,8 +2441,17 @@ jQuery(async () => {
 
     $('#extensions_settings2').append(extensionPanel);
 
+    // 绑定启用开关
+    $('#st-gpt-sovits-enabled').prop('checked', extensionEnabled).on('change', function () {
+        extensionEnabled = $(this).is(':checked');
+        saveSettings();
+        const panel = document.getElementById('tts-floating-panel');
+        if (panel) panel.style.display = extensionEnabled ? 'block' : 'none';
+        toastr.info(extensionEnabled ? 'TTS扩展已启用' : 'TTS扩展已禁用', 'TTS');
+    });
+
     // 绑定按钮
-    $('#tts-reset-panel').on('click', () => {
+    $('#st-gpt-sovits-reset-ui').on('click', () => {
         const panel = document.getElementById('tts-floating-panel');
         if (panel) {
             panel.style.left = '';
@@ -2448,13 +2461,20 @@ jQuery(async () => {
             toastr.success('悬浮窗位置已重置', 'TTS');
         }
     });
-    $('#tts-refresh-models-btn').on('click', fetchTTSModels);
+    $('#st-gpt-sovits-show-panel').on('click', () => {
+        const panel = document.getElementById('tts-floating-panel');
+        if (panel) { panel.style.display = 'block'; showPanel(); toastr.success('悬浮窗已显示', 'TTS'); }
+    });
 
     // 创建悬浮面板
     createFloatingPanel();
 
+    // 根据启用状态显示/隐藏悬浮面板
+    const panel = document.getElementById('tts-floating-panel');
+    if (panel && !extensionEnabled) panel.style.display = 'none';
+
     // 获取模型
-    await fetchTTSModels();
+    if (extensionEnabled) await fetchTTSModels();
 
     // 启动聊天观察器
     observeChat();
