@@ -1606,6 +1606,52 @@ function populateVoiceSelects() {
     });
 }
 
+// 根据识别模式更新设置面板可见性
+function updateSettingsVisibility() {
+    const narrationSetting = document.getElementById('narration-voice-setting');
+    const dialogueSetting = document.getElementById('dialogue-voice-setting');
+    const characterSection = document.getElementById('character-voices-section');
+    const characterGroupsSection = document.getElementById('character-groups-section');
+    const defaultSetting = document.getElementById('default-voice-setting');
+    const globalSpeedSetting = document.getElementById('global-speed-setting');
+
+    if (!narrationSetting || !dialogueSetting || !characterSection || !defaultSetting || !characterGroupsSection || !globalSpeedSetting) return;
+
+    if (detectionMode === 'narration_and_dialogue') {
+        // 旁白对话模式：显示旁白语音、对话语音
+        narrationSetting.style.display = 'block';
+        dialogueSetting.style.display = 'block';
+        characterSection.style.display = 'none';
+        characterGroupsSection.style.display = 'none';
+        defaultSetting.style.display = 'none';
+        globalSpeedSetting.style.display = 'block';
+    } else if (detectionMode === 'character_and_dialogue' || detectionMode === 'character_emotion_and_dialogue') {
+        // 角色对话模式：显示角色设置、分组管理、默认语音
+        narrationSetting.style.display = 'none';
+        dialogueSetting.style.display = 'none';
+        characterSection.style.display = 'block';
+        characterGroupsSection.style.display = 'block';
+        defaultSetting.style.display = 'block';
+        globalSpeedSetting.style.display = 'none';
+    } else if (detectionMode === 'emotion_and_dialogue') {
+        // 情绪对话模式：显示对话语音、默认语音
+        narrationSetting.style.display = 'none';
+        dialogueSetting.style.display = 'block';
+        characterSection.style.display = 'none';
+        characterGroupsSection.style.display = 'none';
+        defaultSetting.style.display = 'block';
+        globalSpeedSetting.style.display = 'block';
+    } else {
+        // 其他模式：只显示默认语音和语速
+        narrationSetting.style.display = 'none';
+        dialogueSetting.style.display = 'none';
+        characterSection.style.display = 'none';
+        characterGroupsSection.style.display = 'none';
+        defaultSetting.style.display = 'block';
+        globalSpeedSetting.style.display = 'block';
+    }
+}
+
 function updateEmotionSelect(voiceName) {
     const emotionSelect = document.getElementById('tts-emotion-select');
     if (!emotionSelect) return;
@@ -2195,11 +2241,11 @@ function createSettingsModal() {
                     
                     <div class="tts-setting-section">
                         <h3>🎙️ 语音设置</h3>
-                        <div class="tts-setting-item"><label>默认语音</label><select id="tts-default-voice" class="tts-voice-select"></select></div>
-                        <div class="tts-setting-item"><label>旁白语音</label><select id="tts-narration-voice" class="tts-voice-select"></select></div>
-                        <div class="tts-setting-item"><label>对话语音</label><select id="tts-dialogue-voice" class="tts-voice-select"></select></div>
+                        <div class="tts-setting-item" id="default-voice-setting"><label>默认语音</label><select id="tts-default-voice" class="tts-voice-select"></select></div>
+                        <div class="tts-setting-item" id="narration-voice-setting"><label>旁白语音</label><select id="tts-narration-voice" class="tts-voice-select"></select></div>
+                        <div class="tts-setting-item" id="dialogue-voice-setting"><label>对话语音</label><select id="tts-dialogue-voice" class="tts-voice-select"></select></div>
                         <div class="tts-setting-item"><label>默认情感</label><select id="tts-emotion-select"><option value="默认">默认</option></select></div>
-                        <div class="tts-setting-item"><label>语速 <span id="speed-value">${speedFacter.toFixed(1)}</span></label><input type="range" id="tts-speed" min="0.5" max="2.0" step="0.1" value="${speedFacter}"></div>
+                        <div class="tts-setting-item" id="global-speed-setting"><label>语速 <span id="speed-value">${speedFacter.toFixed(1)}</span></label><input type="range" id="tts-speed" min="0.5" max="2.0" step="0.1" value="${speedFacter}"></div>
                     </div>
                     
                     <div class="tts-setting-section">
@@ -2222,7 +2268,7 @@ function createSettingsModal() {
                         </div>
                     </div>
                     
-                    <div class="tts-setting-section">
+                    <div class="tts-setting-section" id="character-groups-section">
                         <h3>📂 角色分组管理</h3>
                         <div class="tts-group-controls" style="display:flex;gap:10px;margin-bottom:16px;">
                             <input type="text" id="new-group-name" placeholder="输入分组名称" style="flex:1;">
@@ -2232,7 +2278,7 @@ function createSettingsModal() {
                         <div id="character-groups-container"></div>
                     </div>
                     
-                    <div class="tts-setting-section">
+                    <div class="tts-setting-section" id="character-voices-section">
                         <h3>👥 检测到的角色</h3>
                         <div id="character-voices-container"></div>
                     </div>
@@ -2265,6 +2311,8 @@ function createSettingsModal() {
     renderCharacterGroups();
     renderCharacterVoices();
 
+    // 根据识别模式更新设置项可见性
+    updateSettingsVisibility();
 
     // 事件绑定
     modal.find('.tts-close-btn').on('click', () => modal.remove());
@@ -2284,7 +2332,7 @@ function createSettingsModal() {
     $('#tts-refresh-models').on('click', fetchTTSModels);
 
     // 识别模式
-    $('input[name="detection-mode"]').on('change', function () { detectionMode = $(this).val(); saveSettings(); reparseCurrentMessage(); });
+    $('input[name="detection-mode"]').on('change', function () { detectionMode = $(this).val(); saveSettings(); updateSettingsVisibility(); reparseCurrentMessage(); });
 
     // 引号样式
     $('input[name="quotation-style"]').on('change', function () {
