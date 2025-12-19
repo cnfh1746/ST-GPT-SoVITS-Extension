@@ -749,14 +749,45 @@ function createFloatingPanel() {
     $('#tts-settings-btn').on('click', createSettingsModal);
 }
 
-// 创建设置弹窗 (简化版)
+// 创建设置弹窗 (完整版)
 function createSettingsModal() {
     if ($('#tts-settings-modal').length) { $('#tts-settings-modal').remove(); return; }
+
+    const characterListHtml = allDetectedCharacters.size > 0
+        ? Array.from(allDetectedCharacters).map(char => {
+            const vs = characterVoices[char];
+            const currentVoice = typeof vs === 'object' ? vs.voice : vs;
+            const currentVersion = typeof vs === 'object' ? vs.version : ttsApiVersion;
+            const currentSpeed = typeof vs === 'object' ? (vs.speed || 1.0) : 1.0;
+            return `
+                <div class="tts-character-item" data-character="${char}">
+                    <div class="tts-character-header">
+                        <span class="character-name">${char}</span>
+                        <button class="tts-delete-char" data-character="${char}">×</button>
+                    </div>
+                    <div class="tts-character-controls">
+                        <select class="tts-character-voice tts-voice-select" data-character="${char}"></select>
+                        <select class="tts-character-version" data-character="${char}">
+                            <option value="v2" ${currentVersion === 'v2' ? 'selected' : ''}>v2</option>
+                            <option value="v3" ${currentVersion === 'v3' ? 'selected' : ''}>v3</option>
+                            <option value="v4" ${currentVersion === 'v4' ? 'selected' : ''}>v4</option>
+                        </select>
+                        <div class="tts-character-speed-control">
+                            <label>语速: <span class="tts-character-speed-value">${currentSpeed.toFixed(1)}</span></label>
+                            <input type="range" class="tts-character-speed-slider" data-character="${char}" min="0.5" max="2.0" step="0.1" value="${currentSpeed}">
+                        </div>
+                    </div>
+                </div>`;
+        }).join('')
+        : '<p class="tts-empty-state">暂无检测到的角色</p>';
 
     const modal = $(`
         <div id="tts-settings-modal" class="tts-modal">
             <div class="tts-modal-content">
-                <div class="tts-modal-header"><h2>⚙ TTS设置</h2><button class="tts-close-btn">×</button></div>
+                <div class="tts-modal-header">
+                    <h2>⚙ TTS设置 <span class="version">v1.0.0</span></h2>
+                    <button class="tts-close-btn">×</button>
+                </div>
                 <div class="tts-modal-body">
                     <div class="tts-setting-section">
                         <h3>🔧 API设置</h3>
@@ -768,17 +799,64 @@ function createSettingsModal() {
                                 <option value="v4" ${ttsApiVersion === 'v4' ? 'selected' : ''}>v4</option>
                             </select>
                         </div>
-                        <div class="tts-setting-item"><button id="tts-refresh-models" class="tts-test-btn">刷新模型</button></div>
+                        <div class="tts-setting-item" style="display:flex;gap:10px;">
+                            <button id="tts-test-connection" class="menu_button">测试连接</button>
+                            <button id="tts-refresh-models" class="menu_button">刷新模型</button>
+                        </div>
                     </div>
+                    
+                    <div class="tts-setting-section">
+                        <h3>🎯 识别模式</h3>
+                        <div class="tts-radio-group">
+                            <label class="tts-radio-item"><input type="radio" name="detection-mode" value="character_and_dialogue" ${detectionMode === 'character_and_dialogue' ? 'checked' : ''}><span>【角色】「对话」</span></label>
+                            <label class="tts-radio-item"><input type="radio" name="detection-mode" value="character_emotion_and_dialogue" ${detectionMode === 'character_emotion_and_dialogue' ? 'checked' : ''}><span>【角色】〈情绪〉「对话」</span></label>
+                            <label class="tts-radio-item"><input type="radio" name="detection-mode" value="emotion_and_dialogue" ${detectionMode === 'emotion_and_dialogue' ? 'checked' : ''}><span>〈情绪〉「对话」</span></label>
+                            <label class="tts-radio-item"><input type="radio" name="detection-mode" value="narration_and_dialogue" ${detectionMode === 'narration_and_dialogue' ? 'checked' : ''}><span>旁白与对话</span></label>
+                            <label class="tts-radio-item"><input type="radio" name="detection-mode" value="dialogue_only" ${detectionMode === 'dialogue_only' ? 'checked' : ''}><span>仅「对话」</span></label>
+                            <label class="tts-radio-item"><input type="radio" name="detection-mode" value="entire_message" ${detectionMode === 'entire_message' ? 'checked' : ''}><span>朗读整段</span></label>
+                        </div>
+                    </div>
+                    
+                    <div class="tts-setting-section">
+                        <h3>📝 引号样式</h3>
+                        <div class="tts-toggle-group">
+                            <label class="tts-toggle-item ${quotationStyle === 'japanese' ? 'active' : ''}"><input type="radio" name="quotation-style" value="japanese" ${quotationStyle === 'japanese' ? 'checked' : ''}><span>日式「」</span></label>
+                            <label class="tts-toggle-item ${quotationStyle === 'western' ? 'active' : ''}"><input type="radio" name="quotation-style" value="western" ${quotationStyle === 'western' ? 'checked' : ''}><span>西式""</span></label>
+                        </div>
+                    </div>
+                    
                     <div class="tts-setting-section">
                         <h3>🎙️ 语音设置</h3>
                         <div class="tts-setting-item"><label>默认语音</label><select id="tts-default-voice" class="tts-voice-select"></select></div>
+                        <div class="tts-setting-item"><label>旁白语音</label><select id="tts-narration-voice" class="tts-voice-select"></select></div>
+                        <div class="tts-setting-item"><label>对话语音</label><select id="tts-dialogue-voice" class="tts-voice-select"></select></div>
                         <div class="tts-setting-item"><label>默认情感</label><select id="tts-emotion-select"><option value="默认">默认</option></select></div>
                         <div class="tts-setting-item"><label>语速 <span id="speed-value">${speedFacter.toFixed(1)}</span></label><input type="range" id="tts-speed" min="0.5" max="2.0" step="0.1" value="${speedFacter}"></div>
                     </div>
+                    
                     <div class="tts-setting-section">
-                        <h3>⚡ 功能设置</h3>
-                        <div class="tts-setting-item"><label><input type="checkbox" id="tts-auto-play" ${autoPlayEnabled ? 'checked' : ''}> 自动播放</label></div>
+                        <h3>⚡ 功能开关</h3>
+                        <div class="tts-setting-item">
+                            <label class="tts-switch-label">
+                                <span>自动播放</span>
+                                <input type="checkbox" id="tts-auto-play" ${autoPlayEnabled ? 'checked' : ''}>
+                                <span class="tts-switch-slider"></span>
+                            </label>
+                            <p class="tts-setting-desc">收到新消息后自动开始TTS播放</p>
+                        </div>
+                        <div class="tts-setting-item">
+                            <label class="tts-switch-label">
+                                <span>前端美化适配</span>
+                                <input type="checkbox" id="tts-frontend-adaptation" ${frontendAdaptationEnabled ? 'checked' : ''}>
+                                <span class="tts-switch-slider"></span>
+                            </label>
+                            <p class="tts-setting-desc">启用后可从juus本体等美化前端中解析文本（暂未完全支持）</p>
+                        </div>
+                    </div>
+                    
+                    <div class="tts-setting-section">
+                        <h3>👥 检测到的角色</h3>
+                        <div id="tts-character-list">${characterListHtml}</div>
                     </div>
                 </div>
             </div>
@@ -786,20 +864,96 @@ function createSettingsModal() {
     `);
 
     $('body').append(modal);
+
+    // 填充语音选择下拉框
     populateVoiceSelects();
     $('#tts-default-voice').val(defaultVoice);
+    $('#tts-narration-voice').val(narrationVoice);
+    $('#tts-dialogue-voice').val(dialogueVoice);
     updateEmotionSelect(defaultVoice);
 
+    // 填充角色语音选择
+    allDetectedCharacters.forEach(char => {
+        const vs = characterVoices[char];
+        const currentVoice = typeof vs === 'object' ? vs.voice : vs;
+        const select = modal.find(`.tts-character-voice[data-character="${char}"]`);
+        select.html(`<option value="">-- 选择语音 --</option><option value="${DO_NOT_PLAY_VALUE}">不播放</option>`);
+        ttsModels.forEach(model => {
+            select.append(`<option value="${model}" ${model === currentVoice ? 'selected' : ''}>${model}</option>`);
+        });
+    });
+
+    // 事件绑定
     modal.find('.tts-close-btn').on('click', () => modal.remove());
     modal.on('click', (e) => { if (e.target === modal[0]) modal.remove(); });
 
+    // API设置
     $('#tts-api-url').on('change', function () { ttsApiBaseUrl = $(this).val().replace(/\/$/, ''); updateApiEndpoints(); saveSettings(); });
     $('#tts-api-version').on('change', function () { ttsApiVersion = $(this).val(); saveSettings(); fetchTTSModels(); });
+    $('#tts-test-connection').on('click', async function () {
+        try {
+            toastr.info('正在测试连接...', 'TTS');
+            const response = await makeRequest(TTS_API_ENDPOINT_MODELS, { method: "POST", headers: { "Content-Type": "application/json" }, data: JSON.stringify({ version: ttsApiVersion }), timeout: 5000 });
+            if (response.status === 200) toastr.success('连接成功！', 'TTS');
+            else toastr.error(`连接失败: ${response.status}`, 'TTS');
+        } catch (error) { toastr.error(`连接失败: ${error.message}`, 'TTS'); }
+    });
     $('#tts-refresh-models').on('click', fetchTTSModels);
+
+    // 识别模式
+    $('input[name="detection-mode"]').on('change', function () { detectionMode = $(this).val(); saveSettings(); reparseCurrentMessage(); });
+
+    // 引号样式
+    $('input[name="quotation-style"]').on('change', function () {
+        quotationStyle = $(this).val();
+        $('.tts-toggle-item').removeClass('active');
+        $(this).closest('.tts-toggle-item').addClass('active');
+        saveSettings();
+        reparseCurrentMessage();
+    });
+
+    // 语音设置
     $('#tts-default-voice').on('change', function () { defaultVoice = $(this).val(); updateEmotionSelect(defaultVoice); saveSettings(); });
+    $('#tts-narration-voice').on('change', function () { narrationVoice = $(this).val(); saveSettings(); });
+    $('#tts-dialogue-voice').on('change', function () { dialogueVoice = $(this).val(); saveSettings(); });
     $('#tts-emotion-select').on('change', function () { emotion = $(this).val(); saveSettings(); });
     $('#tts-speed').on('input', function () { speedFacter = parseFloat($(this).val()); $('#speed-value').text(speedFacter.toFixed(1)); saveSettings(); });
+
+    // 功能开关
     $('#tts-auto-play').on('change', function () { autoPlayEnabled = $(this).is(':checked'); saveSettings(); });
+    $('#tts-frontend-adaptation').on('change', function () { frontendAdaptationEnabled = $(this).is(':checked'); saveSettings(); });
+
+    // 角色设置
+    modal.on('change', '.tts-character-voice', function () {
+        const char = $(this).data('character');
+        const item = $(this).closest('.tts-character-item');
+        characterVoices[char] = { voice: $(this).val(), version: item.find('.tts-character-version').val(), speed: parseFloat(item.find('.tts-character-speed-slider').val()) };
+        saveSettings();
+    });
+    modal.on('change', '.tts-character-version', function () {
+        const char = $(this).data('character');
+        const item = $(this).closest('.tts-character-item');
+        characterVoices[char] = { voice: item.find('.tts-character-voice').val(), version: $(this).val(), speed: parseFloat(item.find('.tts-character-speed-slider').val()) };
+        saveSettings();
+    });
+    modal.on('input', '.tts-character-speed-slider', function () {
+        const char = $(this).data('character');
+        const item = $(this).closest('.tts-character-item');
+        const speed = parseFloat($(this).val());
+        item.find('.tts-character-speed-value').text(speed.toFixed(1));
+        characterVoices[char] = { voice: item.find('.tts-character-voice').val(), version: item.find('.tts-character-version').val(), speed };
+        saveSettings();
+    });
+    modal.on('click', '.tts-delete-char', function () {
+        const char = $(this).data('character');
+        allDetectedCharacters.delete(char);
+        delete characterVoices[char];
+        saveSettings();
+        $(this).closest('.tts-character-item').remove();
+        if (allDetectedCharacters.size === 0) {
+            $('#tts-character-list').html('<p class="tts-empty-state">暂无检测到的角色</p>');
+        }
+    });
 }
 
 // ========== 入口点 ==========

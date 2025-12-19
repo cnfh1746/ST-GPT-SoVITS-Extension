@@ -129,9 +129,12 @@
 }
 
 @keyframes edgeIndicatorGlow {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: -2px 0 12px rgba(128, 90, 213, 0.2), -4px 0 16px rgba(0, 0, 0, 0.3);
     }
+
     50% {
         box-shadow: -2px 0 20px rgba(128, 90, 213, 0.5), -4px 0 16px rgba(0, 0, 0, 0.3);
     }
@@ -140,9 +143,10 @@
 /* 主控制区域 */
 .tts-main-controls {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    flex-direction: row;
+    gap: 6px;
     align-items: center;
+    flex-wrap: nowrap;
 }
 
 /* 控制按钮样式 */
@@ -170,7 +174,7 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
     transition: left 0.5s;
 }
 
@@ -284,8 +288,13 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .tts-modal-content {
@@ -306,6 +315,7 @@
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -478,7 +488,7 @@
     margin: 0;
 }
 
-.tts-radio-item input[type="radio"]:checked + span {
+.tts-radio-item input[type="radio"]:checked+span {
     color: #667eea;
     font-weight: 600;
 }
@@ -554,18 +564,18 @@
     top: 2px;
     left: 2px;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .tts-switch-label input[type="checkbox"] {
     display: none;
 }
 
-.tts-switch-label input[type="checkbox"]:checked + .tts-switch-slider {
+.tts-switch-label input[type="checkbox"]:checked+.tts-switch-slider {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.tts-switch-label input[type="checkbox"]:checked + .tts-switch-slider::before {
+.tts-switch-label input[type="checkbox"]:checked+.tts-switch-slider::before {
     transform: translateX(26px);
 }
 
@@ -594,7 +604,7 @@
     border-radius: 50%;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .tts-character-item {
@@ -695,7 +705,7 @@
     border-radius: 50%;
     background: #667eea;
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     transition: all 0.2s ease;
 }
 
@@ -713,7 +723,7 @@
     background: #667eea;
     cursor: pointer;
     border: none;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .tts-character-speed-value,
@@ -1067,11 +1077,11 @@
     border-radius: 50%;
 }
 
-.tts-switch input:checked + .tts-switch-slider {
+.tts-switch input:checked+.tts-switch-slider {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.tts-switch input:checked + .tts-switch-slider:before {
+.tts-switch input:checked+.tts-switch-slider:before {
     transform: translateX(26px);
 }
 
