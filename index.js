@@ -144,13 +144,14 @@ function showNotification(message, type = 'info', duration = 3000) {
 }
 
 // 显示控制台日志查看器
+// 显示控制台日志查看器
 function showConsoleLogger() {
     const existingModal = document.getElementById('console-logger-modal');
     if (existingModal) { existingModal.remove(); return; }
 
     const modal = $(`
         <div id="console-logger-modal" class="tts-modal">
-            <div class="tts-modal-content" style="max-width:900px;max-height:700px;">
+            <div class="tts-modal-content">
                 <div class="tts-modal-header">
                     <h2><i class="icon">📋</i> 控制台日志查看器</h2>
                     <div class="header-buttons">
@@ -159,18 +160,18 @@ function showConsoleLogger() {
                         <button class="tts-close-btn">×</button>
                     </div>
                 </div>
-                <div class="tts-modal-body" style="padding:0;">
-                    <div style="padding:15px 20px;border-bottom:1px solid #e0e0e0;background:#f8f9fa;">
-                        <div style="display:flex;gap:15px;align-items:center;flex-wrap:wrap;">
+                <div class="tts-modal-body" style="padding:0; display:flex; flex-direction:column; overflow:hidden;">
+                    <div class="tts-log-toolbar">
+                        <div class="tts-log-filters">
                             <label style="font-weight:600;">日志类型过滤：</label>
-                            <label><input type="checkbox" id="filter-log" checked> Log</label>
-                            <label><input type="checkbox" id="filter-warn" checked> Warn</label>
-                            <label><input type="checkbox" id="filter-error" checked> Error</label>
-                            <label><input type="checkbox" id="filter-info" checked> Info</label>
-                            <span id="log-count" style="margin-left:auto;color:#666;font-size:12px;">共 0 条日志</span>
+                            <label class="tts-log-filter-item"><input type="checkbox" id="filter-log" checked> Log</label>
+                            <label class="tts-log-filter-item"><input type="checkbox" id="filter-warn" checked> Warn</label>
+                            <label class="tts-log-filter-item"><input type="checkbox" id="filter-error" checked> Error</label>
+                            <label class="tts-log-filter-item"><input type="checkbox" id="filter-info" checked> Info</label>
+                            <span id="log-count" class="tts-log-count">共 0 条日志</span>
                         </div>
                     </div>
-                    <div id="log-container" style="height:500px;overflow-y:auto;background:#1e1e1e;color:#d4d4d4;font-family:Consolas,Monaco,monospace;font-size:12px;line-height:1.4;padding:15px;border-radius:8px;margin:20px;"></div>
+                    <div id="log-container" class="tts-log-container"></div>
                 </div>
             </div>
         </div>
@@ -187,18 +188,23 @@ function showConsoleLogger() {
         };
         const filteredLogs = consoleLogs.filter(log => filters[log.type]);
         $('#log-count').text(`共 ${filteredLogs.length} 条日志`);
-        const typeColors = { log: '#d4d4d4', warn: '#ffcc02', error: '#f44747', info: '#007acc' };
+
+        // 使用 CSS 变量或预定义颜色，这里保留 hex 以兼容现有逻辑
+        const typeColors = { log: '#d4d4d4', warn: '#f59e0b', error: '#ef4444', info: '#3b82f6' };
         const typeIcons = { log: '📝', warn: '⚠️', error: '❌', info: 'ℹ️' };
+
         $('#log-container').html(filteredLogs.map(log => `
-            <div style="margin-bottom:8px;padding:8px;border-left:3px solid ${typeColors[log.type]};background:rgba(255,255,255,0.02);">
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <div class="tts-log-entry" style="border-left-color: ${typeColors[log.type]}">
+                <div class="tts-log-header">
                     <span style="color:${typeColors[log.type]};">${typeIcons[log.type]} [${log.type.toUpperCase()}]</span>
-                    <span style="color:#888;font-size:11px;">${log.timestamp}</span>
+                    <span class="tts-log-timestamp">${log.timestamp}</span>
                 </div>
-                <div style="color:${typeColors[log.type]};word-break:break-all;">${log.message}</div>
+                <div class="tts-log-message" style="color:${typeColors[log.type]};">${log.message}</div>
             </div>
         `).join(''));
-        $('#log-container')[0].scrollTop = $('#log-container')[0].scrollHeight;
+
+        const container = $('#log-container')[0];
+        container.scrollTop = container.scrollHeight;
     }
 
     renderLogs();
