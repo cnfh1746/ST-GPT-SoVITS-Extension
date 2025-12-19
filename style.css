@@ -1,3 +1,6 @@
+/* GPT-SoVITS TTS Player - 完整样式 */
+/* 移植自油猴脚本 v18.7 */
+
 /* 浮动面板基础样式 */
 .tts-panel {
     position: fixed;
@@ -13,7 +16,6 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
-    /* 移动端优化 */
     max-width: calc(100vw - 40px);
     max-height: calc(100vh - 40px);
 }
@@ -25,12 +27,10 @@
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 拖拽中效果 */
 .tts-panel.dragging {
     transform: translateY(-50%) scale(1.05);
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
 }
-
 
 /* 边缘依附模式 */
 .tts-panel.edge-mode {
@@ -128,7 +128,6 @@
     transform: translateY(-50%) scale(0.95);
 }
 
-/* 角标动画效果 */
 @keyframes edgeIndicatorGlow {
     0%, 100% {
         box-shadow: -2px 0 12px rgba(128, 90, 213, 0.2), -4px 0 16px rgba(0, 0, 0, 0.3);
@@ -145,7 +144,6 @@
     gap: 8px;
     align-items: center;
 }
-
 
 /* 控制按钮样式 */
 .tts-control-btn {
@@ -299,7 +297,6 @@
     overflow: hidden;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
     animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    /* 移动端优化 */
     position: relative;
     margin: 20px;
 }
@@ -393,8 +390,6 @@
     padding: 30px 35px;
     max-height: calc(90vh - 80px);
     overflow-y: auto;
-    /* 确保文本颜色为黑色，以适应SillyTavern的暗色主题 */
-    color: #333;
 }
 
 .tts-setting-section {
@@ -446,7 +441,6 @@
     font-size: 14px;
     background: white;
     transition: all 0.2s ease;
-    color: #333;
 }
 
 .tts-setting-item input[type="text"]:focus,
@@ -473,7 +467,6 @@
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: #333;
 }
 
 .tts-radio-item:hover {
@@ -507,7 +500,6 @@
     transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
-    color: #333;
 }
 
 .tts-toggle-item::before {
@@ -645,13 +637,26 @@
     transform: scale(1.1);
 }
 
+.tts-character-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
 .tts-character-voice {
     width: 100%;
     padding: 6px 10px;
     border: 1px solid #ced4da;
     border-radius: 6px;
     font-size: 13px;
-    color: #333;
+}
+
+.tts-character-version {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 13px;
 }
 
 .tts-character-speed-control {
@@ -725,11 +730,18 @@
 }
 
 /* 通知样式 */
-.tts-notification {
+#tts-notification-container {
     position: fixed;
     top: 20px;
     right: 20px;
-    z-index: 10001;
+    z-index: 10002;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.tts-notification {
     padding: 12px 20px;
     border-radius: 8px;
     color: white;
@@ -739,6 +751,7 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transform: translateX(100%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: auto;
 }
 
 .tts-notification.show {
@@ -761,143 +774,6 @@
 .tts-notification.error {
     background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
     color: #721c24;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-    .tts-panel {
-        top: 50%;
-        transform: translateY(-50%);
-        right: 10px;
-        padding: 8px;
-        /* 确保在手机上完整显示 */
-        max-width: calc(100vw - 20px);
-        max-height: calc(100vh - 40px);
-        overflow-y: auto;
-    }
-
-    .tts-control-btn {
-        padding: 8px 10px;
-        min-width: 40px;
-        font-size: 12px;
-    }
-
-    .tts-control-btn .text {
-        display: none;
-    }
-
-    .tts-modal-content {
-        width: 98%;
-        margin: 5px;
-        max-height: calc(100vh - 10px);
-        /* 确保弹窗在手机上完全显示 */
-        position: fixed;
-        top: 5px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-
-    .tts-modal-header {
-        padding: 12px 15px;
-        flex-wrap: nowrap;
-    }
-
-    .tts-modal-header h2 {
-        font-size: 16px;
-        flex-shrink: 1;
-        min-width: 0;
-        white-space: nowrap;
-    }
-
-    .tts-modal-header .version {
-        font-size: 10px;
-        padding: 1px 6px;
-        flex-shrink: 0;
-    }
-
-    .header-buttons {
-        gap: 4px;
-        flex-shrink: 0;
-    }
-
-    .tts-header-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 12px;
-    }
-
-    .tts-close-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 16px;
-    }
-
-    .tts-modal-body {
-        padding: 20px 25px;
-        max-height: calc(100vh - 120px);
-        overflow-y: auto;
-    }
-
-    .tts-radio-group {
-        grid-template-columns: 1fr;
-    }
-
-    .tts-toggle-group {
-        flex-direction: column;
-    }
-
-
-    .tts-edge-indicator {
-        top: 50%;
-        transform: translateY(-50%);
-    }
-}
-
-/* 超小屏幕优化 */
-@media (max-width: 480px) {
-    .tts-panel {
-        right: 5px;
-        padding: 6px;
-        top: 50%;
-        transform: translateY(-50%);
-        bottom: auto;
-    }
-
-    .tts-control-btn {
-        padding: 6px 8px;
-        min-width: 36px;
-        font-size: 11px;
-    }
-
-    .tts-modal-content {
-        width: 98%;
-        margin: 5px;
-        max-height: calc(100vh - 10px);
-    }
-
-    .tts-modal-body {
-        padding: 10px;
-        max-height: calc(100vh - 100px);
-    }
-}
-
-/* 滚动条美化 */
-.tts-modal-body::-webkit-scrollbar {
-    width: 6px;
-}
-
-.tts-modal-body::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
-}
-
-.tts-modal-body::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 3px;
-}
-
-.tts-modal-body::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
 }
 
 /* 角色分组管理样式 */
@@ -988,6 +864,7 @@
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid #e9ecef;
+    cursor: pointer;
 }
 
 .tts-group-info {
@@ -1003,30 +880,12 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    cursor: pointer;
 }
 
 .tts-collapse-icon {
     font-size: 12px;
     color: #6c757d;
     transition: transform 0.2s ease;
-}
-
-.tts-character-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 1;
-}
-
-.tts-character-voice-in-group {
-    min-width: 150px;
-    padding: 4px 8px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    font-size: 12px;
-    background: white;
-    color: #333;
 }
 
 .tts-group-count {
@@ -1080,6 +939,31 @@
     color: #495057;
 }
 
+.tts-character-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    flex-wrap: wrap;
+}
+
+.tts-character-controls-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.tts-character-voice-in-group,
+.tts-character-version-in-group {
+    min-width: 120px;
+    padding: 4px 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 12px;
+    background: white;
+}
+
 .tts-remove-from-group {
     background: #ffc107;
     color: #212529;
@@ -1120,7 +1004,6 @@
     border-radius: 6px;
     font-size: 13px;
     background: white;
-    color: #333;
 }
 
 .tts-add-to-group {
@@ -1140,17 +1023,193 @@
     transform: translateY(-1px);
 }
 
-/* 更新设置面板可见性控制 */
-#character-groups-section {
-    display: block !important;
+/* Switch容器样式 */
+.tts-switch-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.tts-modal-content {
-    width: 90vw;
-    max-width: none;
+.tts-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
 }
 
-/* 网址白名单管理样式 */
-.whitelist-item code {
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+.tts-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.tts-switch .tts-switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.tts-switch .tts-switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.tts-switch input:checked + .tts-switch-slider {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.tts-switch input:checked + .tts-switch-slider:before {
+    transform: translateX(26px);
+}
+
+.tts-switch-text {
+    font-size: 13px;
+    color: #495057;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .tts-panel {
+        top: 50%;
+        transform: translateY(-50%);
+        right: 10px;
+        padding: 8px;
+        max-width: calc(100vw - 20px);
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+    }
+
+    .tts-control-btn {
+        padding: 8px 10px;
+        min-width: 40px;
+        font-size: 12px;
+    }
+
+    .tts-control-btn .text {
+        display: none;
+    }
+
+    .tts-modal-content {
+        width: 98%;
+        margin: 5px;
+        max-height: calc(100vh - 10px);
+        position: fixed;
+        top: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .tts-modal-header {
+        padding: 12px 15px;
+        flex-wrap: nowrap;
+    }
+
+    .tts-modal-header h2 {
+        font-size: 16px;
+        flex-shrink: 1;
+        min-width: 0;
+        white-space: nowrap;
+    }
+
+    .tts-modal-header .version {
+        font-size: 10px;
+        padding: 1px 6px;
+        flex-shrink: 0;
+    }
+
+    .header-buttons {
+        gap: 4px;
+        flex-shrink: 0;
+    }
+
+    .tts-header-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+
+    .tts-close-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 16px;
+    }
+
+    .tts-modal-body {
+        padding: 20px 25px;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+    }
+
+    .tts-radio-group {
+        grid-template-columns: 1fr;
+    }
+
+    .tts-toggle-group {
+        flex-direction: column;
+    }
+
+    .tts-edge-indicator {
+        top: 50%;
+        transform: translateY(-50%);
+    }
+}
+
+/* 超小屏幕优化 */
+@media (max-width: 480px) {
+    .tts-panel {
+        right: 5px;
+        padding: 6px;
+        top: 50%;
+        transform: translateY(-50%);
+        bottom: auto;
+    }
+
+    .tts-control-btn {
+        padding: 6px 8px;
+        min-width: 36px;
+        font-size: 11px;
+    }
+
+    .tts-modal-content {
+        width: 98%;
+        margin: 5px;
+        max-height: calc(100vh - 10px);
+    }
+
+    .tts-modal-body {
+        padding: 10px;
+        max-height: calc(100vh - 100px);
+    }
+}
+
+/* 滚动条美化 */
+.tts-modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tts-modal-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.tts-modal-body::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 3px;
+}
+
+.tts-modal-body::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
 }

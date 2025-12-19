@@ -1,23 +1,11 @@
-<div class="settings-panel">
-    <h3>GPT-SoVITS TTS 播放器</h3>
-    <p>这是 GPT-SoVITS TTS 播放器的扩展版本。播放器控制面板以悬浮窗形式显示在页面右侧。</p>
-    
-    <div class="settings-item">
-        <label>功能说明</label>
-        <div class="settings-description">
-            <ul>
-                <li><strong>悬浮控制：</strong> 点击页面右侧的浮动面板进行播放控制。</li>
-                <li><strong>设置：</strong> 在悬浮面板中点击齿轮图标配置 API 地址、角色语音等。</li>
-                <li><strong>边缘隐藏：</strong> 支持将面板隐藏到屏幕边缘。</li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="settings-item">
-        <label>故障排除</label>
-        <div class="settings-description">
-            <p>如果悬浮窗没有出现，请尝试刷新页面。</p>
-            <button id="st-gpt-sovits-reset-ui" class="menu_button">重置悬浮窗位置</button>
-        </div>
+<div class="st-gpt-sovits-settings">
+    <p style="margin: 10px 0; color: #666;">TTS悬浮窗已在页面右侧显示。点击悬浮窗的⚙按钮打开完整设置。</p>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button id="st-gpt-sovits-reset-ui" class="menu_button">
+            <i class="fa-solid fa-arrows-rotate"></i> 重置悬浮窗位置
+        </button>
+        <button id="st-gpt-sovits-show-panel" class="menu_button">
+            <i class="fa-solid fa-eye"></i> 显示悬浮窗
+        </button>
     </div>
 </div>
