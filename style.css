@@ -1168,3 +1168,43 @@ input[type=range]::-webkit-slider-thumb:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
+
+/* ========== 提示词注入样式 ========== */
+.tts-prompt-textarea {
+    width: 100%;
+    min-height: 120px;
+    max-height: 300px;
+    padding: 12px 14px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--tts-radius-md);
+    color: var(--tts-text-main);
+    font-size: 13px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    line-height: 1.5;
+    resize: vertical;
+    transition: var(--tts-transition);
+}
+
+.tts-prompt-textarea:focus {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: var(--tts-primary);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+    outline: none;
+}
+
+.tts-prompt-textarea::placeholder {
+    color: var(--tts-text-light);
+}
+
+/* 亮色模式适配 */
+[data-theme='light'] .tts-prompt-textarea {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: var(--tts-text-main);
+}
+
+[data-theme='light'] .tts-prompt-textarea:focus {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--tts-primary);
+}

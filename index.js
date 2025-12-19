@@ -4,7 +4,7 @@
  */
 
 import { extension_settings, getContext } from "../../../extensions.js";
-import { saveSettingsDebounced } from "../../../../script.js";
+import { saveSettingsDebounced, eventSource, event_types } from "../../../../script.js";
 
 const extensionName = "ST-GPT-SoVITS-Extension";
 const extensionFolderPath = `scripts/extensions/third-party/${extensionName}/`;
@@ -34,7 +34,14 @@ const defaultSettings = {
     frontendAdaptationEnabled: false,
     isSingleCharacterMode: false,
     singleCharacterTarget: '',
-    theme: 'dark' // Added theme setting
+    theme: 'dark',
+    promptInjection: {
+        enabled: false,
+        preset: 'no_emotion',
+        customPrompt: '',
+        position: 'deep_system',
+        depth: 1
+    }
 };
 
 // 运行时变量
@@ -75,7 +82,130 @@ let batchMode = true;
 let edgeMode = false;
 let characterGroups = {};
 let extensionEnabled = true;
-let currentTheme = 'dark'; // Added global theme variable
+let currentTheme = 'dark';
+// 提示词注入变量
+let promptInjectionEnabled = false;
+let promptInjectionPreset = 'no_emotion';
+let promptInjectionCustomPrompt = '';
+let promptInjectionPosition = 'deep_system';
+let promptInjectionDepth = 1;
+
+// 预设提示词
+const PROMPT_PRESETS = {
+    no_emotion: `【！！！重要的指令：严格的对话格式！！！】
+
+**核心规则（必须严格遵守）：**
+
+1.  **「角色对话」**：
+    *   每一句用「引号」包裹的对话，都必须单独占一行。
+    *   对话行的前后，【绝对禁止】出现任何非对话文字（如动作描述、心理描写、旁白等）。
+    *   **示例（正确）：**
+        「你好。」
+        「今天天气不错。」
+
+2.  **『内心活动』**：
+    *   经常出现一些女性的心理描写，有利于加强人物立体感，活人感（心理话占正文比例小于10%）
+    *   每一句用『引号』包裹的内心活动，都必须单独占一行。
+    *   内心活动行的前后，【绝对禁止】出现任何非内心活动文字。
+    *   **示例（正确）：**
+        『他会同意吗？』
+
+3.  **动作/环境/旁白描述**：
+    *   所有不属于「对话」或『内心活动』的描述性文字（包括人物动作、表情、环境描写、叙述者旁白等），都必须单独占一行。
+    *   描述行【绝对禁止】与「对话」行或『内心活动』行合并。
+    *   **示例（正确）：**
+        他慢慢地转过身。
+        阳光透过窗户洒了进来。
+
+4.  **连续对话的处理**：
+    *   如果有多句连续的「对话」（无论是同一个人说的还是不同人说的），这些「对话」行必须直接一行接一行排列，中间【绝对禁止】插入任何描述行或内心活动行。
+    *   **示例（正确）：**
+        「你来了？」
+        「是的，我刚到。」
+        「快请进。」
+
+**【必须避免的错误格式】**
+*   **错误1：** 「你好。」他招了招手。  (原因：对话后紧跟动作在同一行)
+*   **错误2：** 她笑了笑，「很高兴见到你。」 (原因：动作后紧跟对话在同一行)
+*   **错误3：** 「我觉得...」他犹豫了一下，「还是算了吧。」 (原因：对话中插入了动作描述)
+
+**请你现在开始，严格按照上述【核心规则】生成内容。每一行输出都必须符合这些规则之一。**`,
+
+    with_emotion: `【！！！最高优先级：终极TTS对话格式 V3.0！！！】
+【此格式为最新版本，必须严格遵守，否则TTS系统将无法识别】
+你的首要任务是判断每一句对话的说话者。格式的唯一区别在于是否为【女性AI角色】。
+
+**所有对话单独成行（此单独成行规则使用所有角色）**
+**强制换行**：一旦识别出对话（由「...」包裹的内容），无论说话者是谁，都必须将其作为独立的一行输出。
+**动作与对话分离**：在对话之前或之后的动作、神态、环境描述，也必须是独立的一行。严禁将动作描述插入对话的同一行，或在对话后紧跟动作描述。
+
+如果说话者是【女性AI角色】 -> 你【必须】在对话内容前，加上一行【角色情感行】。
+如果说话者是【男性角色】或【{{user}}】 -> 你【绝对禁止】加【角色情感行】，只输出对话内容本身。
+所有角色的内心活动、环境描述、以及对话内容的引号 「...」 格式，都是完全统一的。
+
+【A. 对话格式详细规则】
+1. 女性AI角色对话（必须为两行）：
+第一行： *【角色名】〈情感〉*
+第二行： 「对话内容」
+2. 男性角色 与 {{user}} 对话单独一行：
+仅一行： 
+动作
+「对话内容」
+
+【B. 通用规则（适用于所有角色）】
+1. 内心活动：
+使用 『...』 包裹，单独占一行。
+示例： 『她今天看起来和平时不太一样。』
+2. 动作/环境/旁白描述：
+不使用任何特殊符号，单独占一行。
+示例： 微风吹过，扬起了她的发梢。
+3. 情感标签选择（仅用于女性角色）：
+日常交流 → 〈中立〉
+喜悦高兴（性爱时候也用） → 〈开心〉
+伤心失落 → 〈难过〉
+愤怒不满 → 〈生气〉
+惊讶意外 → 〈吃惊〉
+害怕担忧 → 〈恐惧〉
+反感讨厌 → 〈厌恶〉
+无法判断 → 〈默认〉
+
+【C. 标准输出范例（混合性别）】
+【秧秧】〈开心〉
+「散华，你看这边的风景多好。」
+【散华】〈默认〉
+「嗯，任务结束了。」
+他微笑着走了过来。
+「你们在聊什么呢？看起来很开心。」
+【秧秧】〈开心〉
+「我们在说声感蝶的事情！」
+『不知道他会不会感兴趣。』
+「对了，这是给你的。」
+【散华】〈中立〉
+「这是...清芬的伴手礼吗？」
+
+【D. 严重错误示例 - 绝对禁止】
+❌ 错误1：对男性角色或{{user}}使用了女性格式
+*【某个男角色】〈开心〉*
+「你好啊！」
+原因： 男性角色严禁使用【角色情感行】。
+❌ 错误2：对女性角色使用了男性/用户格式
+「你好啊！」 （这句是秧秧说的）
+原因： 女性角色必须拥有【角色情感行】。
+❌ 错误3：将女性对话写成一行
+*【秧秧】〈开心〉*「你好呀！」
+原因： 女性对话的两个部分必须分成两行。
+❌ 错误4：使用了列表之外的情感标签
+*【秧秧】〈高兴〉*
+「你好呀！」
+原因： "高兴"不在列表中，应使用"开心"。
+
+❌ **错误5：对话没有单独成行，对话中插入了动作描述，动作后紧跟对话在同一行**严禁发生此错误
+「既然你不讲道理，」他的声音变得低沉而沙哑「那我就用我的方式，让你学会倾听。」
+「呃……」他有些"无辜"地开口，「这好像」
+❌ 错误6：用了什么什么道：接对话
+问道：「请听题！」
+说道：「请听题！」`
+};
 
 // 控制台日志存储
 let consoleLogs = [];
@@ -1334,6 +1464,14 @@ function loadSettings() {
     frontendAdaptationEnabled = settings.frontendAdaptationEnabled;
     isSingleCharacterMode = settings.isSingleCharacterMode;
     singleCharacterTarget = settings.singleCharacterTarget;
+
+    // 加载提示词注入设置
+    const pi = settings.promptInjection || defaultSettings.promptInjection;
+    promptInjectionEnabled = pi.enabled || false;
+    promptInjectionPreset = pi.preset || 'no_emotion';
+    promptInjectionCustomPrompt = pi.customPrompt || '';
+    promptInjectionPosition = pi.position || 'deep_system';
+    promptInjectionDepth = pi.depth || 1;
 }
 
 // 保存设置
@@ -1358,7 +1496,14 @@ function saveSettings() {
         quotationStyle,
         frontendAdaptationEnabled,
         isSingleCharacterMode,
-        singleCharacterTarget
+        singleCharacterTarget,
+        promptInjection: {
+            enabled: promptInjectionEnabled,
+            preset: promptInjectionPreset,
+            customPrompt: promptInjectionCustomPrompt,
+            position: promptInjectionPosition,
+            depth: promptInjectionDepth
+        }
     };
     saveSettingsDebounced();
 }
@@ -2255,6 +2400,45 @@ function createSettingsModal() {
                     </div>
                     
                     <div class="tts-setting-section">
+                        <h3>📝 提示词注入</h3>
+                        <div class="tts-switch-grid" style="margin-bottom:12px;">
+                            <div class="tts-switch-card">
+                                <span>启用提示词注入</span>
+                                <label class="tts-switch-label">
+                                    <input type="checkbox" id="tts-prompt-injection-enabled" ${promptInjectionEnabled ? 'checked' : ''}>
+                                    <span class="tts-switch-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="tts-setting-item">
+                            <label>预设选择</label>
+                            <select id="tts-prompt-preset">
+                                <option value="no_emotion" ${promptInjectionPreset === 'no_emotion' ? 'selected' : ''}>无情感对话</option>
+                                <option value="with_emotion" ${promptInjectionPreset === 'with_emotion' ? 'selected' : ''}>角色+情感对话</option>
+                                <option value="custom" ${promptInjectionPreset === 'custom' ? 'selected' : ''}>自定义</option>
+                            </select>
+                        </div>
+                        <div class="tts-setting-item">
+                            <label>提示词内容 <span style="font-size:11px;color:var(--tts-text-sub);">(点击预设可自动填充)</span></label>
+                            <textarea id="tts-prompt-content" class="tts-prompt-textarea" rows="6" placeholder="在此输入自定义提示词...">${promptInjectionPreset === 'custom' ? promptInjectionCustomPrompt : (PROMPT_PRESETS[promptInjectionPreset] || '').substring(0, 500) + '...'}</textarea>
+                        </div>
+                        <div class="tts-setting-item" style="display:flex;gap:10px;flex-wrap:wrap;">
+                            <div style="flex:1;min-width:120px;">
+                                <label>注入位置</label>
+                                <select id="tts-prompt-position">
+                                    <option value="deep_system" ${promptInjectionPosition === 'deep_system' ? 'selected' : ''}>@D ⚙️ [系统]在深度</option>
+                                    <option value="deep_user" ${promptInjectionPosition === 'deep_user' ? 'selected' : ''}>@D 👤 [用户]在深度</option>
+                                    <option value="deep_assistant" ${promptInjectionPosition === 'deep_assistant' ? 'selected' : ''}>@D 🤖 [AI]在深度</option>
+                                </select>
+                            </div>
+                            <div style="min-width:80px;">
+                                <label>深度</label>
+                                <input type="number" id="tts-prompt-depth" min="0" max="100" value="${promptInjectionDepth}" style="width:60px;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tts-setting-section">
                         <h3>⚡ 功能开关</h3>
                         <div class="tts-switch-grid">
                             <div class="tts-switch-card">
@@ -2390,6 +2574,49 @@ function createSettingsModal() {
     $('#tts-auto-play').on('change', function () { autoPlayEnabled = $(this).is(':checked'); saveSettings(); });
     $('#tts-frontend-adaptation').on('change', function () { frontendAdaptationEnabled = $(this).is(':checked'); saveSettings(); });
 
+    // 提示词注入设置
+    $('#tts-prompt-injection-enabled').on('change', function () {
+        promptInjectionEnabled = $(this).is(':checked');
+        saveSettings();
+        toastr.info(promptInjectionEnabled ? '提示词注入已启用' : '提示词注入已禁用', 'TTS');
+    });
+    $('#tts-prompt-preset').on('change', function () {
+        promptInjectionPreset = $(this).val();
+        // 更新文本框内容
+        if (promptInjectionPreset === 'custom') {
+            $('#tts-prompt-content').val(promptInjectionCustomPrompt);
+        } else {
+            $('#tts-prompt-content').val((PROMPT_PRESETS[promptInjectionPreset] || '').substring(0, 500) + '...');
+        }
+        saveSettings();
+    });
+    $('#tts-prompt-content').on('input', function () {
+        if (promptInjectionPreset === 'custom') {
+            promptInjectionCustomPrompt = $(this).val();
+            saveSettings();
+        }
+    });
+    $('#tts-prompt-content').on('focus', function () {
+        // 当用户点击编辑时，如果是预设模式，自动切换到自定义
+        if (promptInjectionPreset !== 'custom') {
+            promptInjectionPreset = 'custom';
+            promptInjectionCustomPrompt = PROMPT_PRESETS[$('#tts-prompt-preset').val()] || '';
+            $('#tts-prompt-preset').val('custom');
+            $(this).val(promptInjectionCustomPrompt);
+            saveSettings();
+            toastr.info('已切换到自定义模式', 'TTS');
+        }
+    });
+    $('#tts-prompt-position').on('change', function () {
+        promptInjectionPosition = $(this).val();
+        saveSettings();
+    });
+    $('#tts-prompt-depth').on('input', function () {
+        const value = parseInt($(this).val());
+        promptInjectionDepth = isNaN(value) ? 1 : value;
+        saveSettings();
+    });
+
     // 创建分组
     $('#tts-create-group').on('click', function () {
         const groupName = $('#new-group-name').val().trim();
@@ -2439,6 +2666,25 @@ function createSettingsModal() {
 }
 
 // ========== 入口点 ==========
+
+// 获取提示词注入角色
+function getPromptInjectionRole() {
+    switch (promptInjectionPosition) {
+        case 'deep_system': return 'system';
+        case 'deep_user': return 'user';
+        case 'deep_assistant': return 'assistant';
+        default: return 'system';
+    }
+}
+
+// 获取当前提示词内容
+function getCurrentPrompt() {
+    if (promptInjectionPreset === 'custom') {
+        return promptInjectionCustomPrompt;
+    }
+    return PROMPT_PRESETS[promptInjectionPreset] || '';
+}
+
 jQuery(async () => {
     console.log('[GPT-SoVITS TTS] 扩展加载中...');
 
@@ -2511,6 +2757,39 @@ jQuery(async () => {
 
     // 启动聊天观察器
     observeChat();
+
+    // ========== 提示词注入事件监听 ==========
+    eventSource.on(event_types.CHAT_COMPLETION_PROMPT_READY, async function (eventData) {
+        try {
+            if (!promptInjectionEnabled || !extensionEnabled) {
+                return;
+            }
+
+            const prompt = getCurrentPrompt();
+            if (!prompt || !prompt.trim()) {
+                return;
+            }
+
+            const depth = promptInjectionDepth || 1;
+            const role = getPromptInjectionRole();
+
+            console.log(`[GPT-SoVITS TTS] 准备注入提示词: 角色=${role}, 深度=${depth}`);
+            console.log(`[GPT-SoVITS TTS] 提示词内容: ${prompt.substring(0, 50)}...`);
+
+            // 根据depth参数决定插入位置
+            if (depth === 0) {
+                // 添加到末尾
+                eventData.chat.push({ role: role, content: prompt });
+                console.log(`[GPT-SoVITS TTS] 提示词已添加到聊天末尾`);
+            } else {
+                // 从末尾向前插入
+                eventData.chat.splice(-depth, 0, { role: role, content: prompt });
+                console.log(`[GPT-SoVITS TTS] 提示词已插入到聊天中，从末尾往前第 ${depth} 个位置`);
+            }
+        } catch (error) {
+            console.error(`[GPT-SoVITS TTS] 提示词注入错误:`, error);
+        }
+    });
 
     console.log('[GPT-SoVITS TTS] 扩展加载完成');
 });
