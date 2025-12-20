@@ -919,6 +919,7 @@ function processMessageText(fullText, messageElement) {
             const dialogue = match[2].trim();
             if (dialogue && validDialogueRegex.test(dialogue)) {
                 currentMessageParts.push({ type: 'character_dialogue', character, dialogue });
+                console.log(`检测到角色对话: 【${character}】 → 「${dialogue.substring(0, 30)}${dialogue.length > 30 ? '...' : ''}」`);
                 actualDialogueCount++;
                 if (character && !allDetectedCharacters.has(character)) {
                     allDetectedCharacters.add(character);
@@ -937,6 +938,7 @@ function processMessageText(fullText, messageElement) {
             const dialogue = match[3].trim();
             if (dialogue && validDialogueRegex.test(dialogue)) {
                 currentMessageParts.push({ type: 'character_emotion_dialogue', character, emotion: charEmotion, dialogue });
+                console.log(`检测到角色情绪对话: 【${character}】〈${charEmotion}〉 → 「${dialogue.substring(0, 30)}${dialogue.length > 30 ? '...' : ''}」`);
                 actualDialogueCount++;
                 if (character && !allDetectedCharacters.has(character)) {
                     allDetectedCharacters.add(character);
@@ -954,6 +956,7 @@ function processMessageText(fullText, messageElement) {
             const dialogue = match[2].trim();
             if (dialogue && validDialogueRegex.test(dialogue)) {
                 currentMessageParts.push({ type: 'emotion_dialogue', emotion: charEmotion, dialogue });
+                console.log(`检测到情绪对话: 〈${charEmotion}〉 → 「${dialogue.substring(0, 30)}${dialogue.length > 30 ? '...' : ''}」`);
                 actualDialogueCount++;
             }
         }
@@ -966,11 +969,13 @@ function processMessageText(fullText, messageElement) {
                 const dialogue = extractDialogue(trimmedSegment);
                 if (dialogue && validDialogueRegex.test(dialogue)) {
                     currentMessageParts.push({ type: 'dialogue', dialogue });
+                    console.log(`检测到对话: 「${dialogue.substring(0, 40)}${dialogue.length > 40 ? '...' : ''}」`);
                     actualDialogueCount++;
                 }
             } else {
                 if (validDialogueRegex.test(trimmedSegment)) {
                     currentMessageParts.push({ type: 'narration', dialogue: trimmedSegment });
+                    console.log(`检测到旁白: ${trimmedSegment.substring(0, 40)}${trimmedSegment.length > 40 ? '...' : ''}`);
                 }
             }
         }
@@ -982,6 +987,7 @@ function processMessageText(fullText, messageElement) {
             const dialogue = match[1].trim();
             if (dialogue && validDialogueRegex.test(dialogue)) {
                 allDialogues.push(dialogue);
+                console.log(`检测到纯对话: 「${dialogue.substring(0, 40)}${dialogue.length > 40 ? '...' : ''}」`);
                 actualDialogueCount++;
             }
         }
@@ -990,6 +996,7 @@ function processMessageText(fullText, messageElement) {
         const trimmedText = fullText.trim();
         if (trimmedText) {
             currentMessageParts.push({ type: 'entire_message', dialogue: trimmedText });
+            console.log(`检测到整段文本: ${trimmedText.substring(0, 50)}${trimmedText.length > 50 ? '...' : ''}`);
             actualDialogueCount = 1;
         }
     }
