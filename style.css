@@ -1208,3 +1208,238 @@ input[type=range]::-webkit-slider-thumb:hover {
     background: rgba(255, 255, 255, 0.9);
     border-color: var(--tts-primary);
 }
+
+/* ========== 移动端响应式适配 (max-width: 480px) ========== */
+@media (max-width: 480px) {
+
+    /* 浮动面板 - 底部固定，全宽 */
+    .tts-panel {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        transform: none;
+        max-width: 100%;
+        border-radius: var(--tts-radius-lg) var(--tts-radius-lg) 0 0;
+        padding: 12px;
+        max-height: 45vh;
+        overflow-y: auto;
+    }
+
+    .tts-panel.edge-mode {
+        right: 0;
+        bottom: -200px;
+    }
+
+    .tts-panel.edge-mode:hover {
+        right: 0;
+        bottom: 0;
+    }
+
+    .tts-panel.edge-hidden {
+        bottom: -100% !important;
+        right: 0 !important;
+    }
+
+    /* 边缘指示器 - 移动到底部 */
+    .tts-edge-indicator {
+        right: auto;
+        left: 50%;
+        top: auto;
+        bottom: 0;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 28px;
+        border-radius: 12px 12px 0 0;
+        border-bottom: none;
+    }
+
+    /* 控制行 - 垂直堆叠 */
+    .tts-control-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    /* 按钮 - 增大触控区域 */
+    .tts-control-btn {
+        min-height: 44px;
+        font-size: 14px;
+        padding: 10px 14px;
+    }
+
+    .tts-control-btn.icon-only {
+        width: 44px;
+        height: 44px;
+        flex: 0 0 44px;
+    }
+
+    /* 模态框 - 接近全屏 */
+    .tts-modal-content {
+        width: 100%;
+        max-width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+        margin: 0;
+    }
+
+    .tts-modal-header {
+        padding: 16px;
+        position: sticky;
+        top: 0;
+        background: var(--tts-glass-bg);
+        z-index: 10;
+    }
+
+    .tts-modal-header h2 {
+        font-size: 18px;
+    }
+
+    .tts-modal-body {
+        padding: 16px;
+    }
+
+    /* 设置区块 - 减小内边距 */
+    .tts-setting-section {
+        padding: 14px;
+        margin-bottom: 14px;
+    }
+
+    .tts-setting-section h3 {
+        font-size: 15px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+    }
+
+    /* 开关网格 - 单列 */
+    .tts-switch-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .tts-switch-card {
+        padding: 14px;
+    }
+
+    /* API 按钮组 - 垂直堆叠 */
+    .tts-api-actions {
+        flex-direction: column;
+    }
+
+    /* 分组控件 - 允许换行 */
+    .tts-group-controls {
+        flex-wrap: wrap;
+    }
+
+    /* 分组头部 */
+    .tts-group-header {
+        padding: 12px 14px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .tts-group-name {
+        font-size: 15px;
+    }
+
+    .tts-group-content {
+        padding: 12px 14px;
+    }
+
+    /* 分组内角色卡片 */
+    .tts-group-character {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .tts-character-info {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .tts-character-controls-group {
+        justify-content: stretch;
+    }
+
+    .tts-character-version-in-group,
+    .tts-character-voice-in-group {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* 添加角色区域 */
+    .tts-add-character {
+        flex-direction: column;
+    }
+
+    .tts-character-select {
+        width: 100%;
+    }
+
+    .tts-add-to-group {
+        width: 100%;
+    }
+
+    /* 日志容器 */
+    .tts-log-container {
+        height: 350px;
+        margin: 12px;
+        padding: 12px;
+        font-size: 11px;
+    }
+
+    .tts-log-toolbar {
+        padding: 10px 14px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .tts-log-filters {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    /* 通知气泡 - 全宽 */
+    #tts-notification-container {
+        left: 12px;
+        right: 12px;
+        top: 12px;
+    }
+
+    .tts-notification {
+        max-width: 100%;
+    }
+
+    /* 输入框优化 */
+    .tts-cool-input {
+        padding: 12px 14px;
+        font-size: 16px;
+        /* 防止 iOS 缩放 */
+    }
+
+    .tts-setting-item input[type="text"],
+    .tts-setting-item select {
+        padding: 12px 14px;
+        font-size: 16px;
+        /* 防止 iOS 缩放 */
+    }
+
+    /* 提示词文本框 */
+    .tts-prompt-textarea {
+        min-height: 100px;
+        font-size: 14px;
+    }
+
+    /* Radio 组 */
+    .tts-radio-group {
+        gap: 8px;
+    }
+
+    .tts-radio-item span {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+}
