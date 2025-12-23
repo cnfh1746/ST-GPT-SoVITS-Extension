@@ -3,7 +3,7 @@
     "display_name": "GPT-SoVITS TTS Player",
     "description": "GPT-SoVITS TTS播放器，支持角色管理、流式播放、多模式识别。完整移植自油猴脚本。",
     "author": "AI & cnfh1746",
-    "version": "1.0.03",
+    "version": "1.1.0",
     "loading_order": 100,
     "js": "index.js",
     "css": "style.css"
